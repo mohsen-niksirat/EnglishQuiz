@@ -347,15 +347,22 @@ function getOverallLevel(levels){
 // SPEECH (TTS)
 // ═══════════════════════════════════════════
 function speak(text,rate=0.85){
-  if(!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='en-US';u.rate=rate;u.pitch=1;
-  const voices=window.speechSynthesis.getVoices();
-  const en=voices.find(v=>v.lang.startsWith('en-US'))||voices.find(v=>v.lang.startsWith('en'));
-  if(en)u.voice=en;
-  window.speechSynthesis.speak(u);
-  return u;
+  if(!window.speechSynthesis){toast('تبدیل متن به صدا در این مرورگر پشتیبانی نمی‌شود','error');return null}
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=rate;u.pitch=1;
+    const voices=window.speechSynthesis.getVoices();
+    const en=voices.find(v=>v.lang.startsWith('en-US'))||voices.find(v=>v.lang.startsWith('en'));
+    if(en)u.voice=en;
+    u.onerror=function(e){console.warn('Speech error:',e.error);toast('خطا در پخش صدا — لطفاً HTTPS استفاده کنید','error')};
+    window.speechSynthesis.speak(u);
+    return u;
+  }catch(err){
+    console.warn('Speech API error:',err);
+    toast('تبدیل متن به صدا نیاز به HTTPS دارد','error');
+    return null;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -629,6 +636,7 @@ function renderListeningQuestion(c,q,s){
     <div style="margin:20px 0">
       <button class="listen-btn" id="listenBtn" type="button">🔊</button>
       <p style="font-size:.8rem;color:var(--text2);margin-top:8px">روی دکمه کلیک کنید تا جمله پخش شود</p>
+      <p id="speechWarning" style="font-size:.7rem;color:var(--warning);margin-top:4px;display:none">⚠️ تبدیل متن به صدا نیاز به HTTPS دارد</p>
     </div>
     <div style="margin-bottom:16px">
       <input type="text" class="q-input" id="listenInput" placeholder="جمله را اینجا تایپ کنید..." autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -1056,6 +1064,12 @@ document.addEventListener('click',e=>{if(!e.target.closest('.sidebar')&&!e.targe
 // ═══════════════════════════════════════════
 if(S.theme){document.documentElement.setAttribute('data-theme',S.theme);document.getElementById('themeBtn').textContent=S.theme==='dark'?'🌙':'☀️'}
 window.speechSynthesis?.getVoices(); // Pre-load voices
+// Check HTTPS for Speech API
+if(location.protocol!=='https:'&&location.hostname!=='127.0.0.1'&&location.hostname!=='localhost'){
+  const w=document.getElementById('speechWarning');
+  if(w)w.style.display='block';
+  console.warn('⚠️ Speech API requires HTTPS for full functionality');
+}
 render();
 </script>
 </body>
