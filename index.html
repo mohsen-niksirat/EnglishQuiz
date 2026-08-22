@@ -1,0 +1,925 @@
+<!-- v1.0 -->
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تعیین سطح انگلیسی — English Level Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b10;--bg2:#13151f;--card:#1a1d2b;--card-hover:#22263a;--border:#2a2e42;--text:#e8eaed;--text2:#8b90a5;--accent:#6c5ce7;--accent2:#a29bfe;--accent-glow:rgba(108,92,231,.25);--success:#00b894;--danger:#e17055;--warning:#fdcb6e;--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-sm:0 2px 8px rgba(0,0,0,.2);--font:'Vazirmatn',system-ui,sans-serif}
+[data-theme="light"]{--bg:#f0f2f5;--bg2:#ffffff;--card:#ffffff;--card-hover:#f5f6fa;--border:#e0e3e8;--text:#1a1d27;--text2:#5f6577;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-sm:0 2px 8px rgba(0,0,0,.04);--accent-glow:rgba(108,92,231,.12)}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.sidebar{width:280px;background:linear-gradient(180deg,rgba(15,15,30,.97),rgba(20,20,40,.95));border-left:1px solid rgba(255,255,255,.06);padding:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;right:0;z-index:100;transition:transform .35s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(24px);overflow-y:auto}
+.sidebar-header{padding:24px 24px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-header h1{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#7c5cfc,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-header p{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:4px;font-weight:500}
+.nav-btn{display:flex;align-items:center;gap:12px;width:calc(100% - 20px);margin:2px 10px;padding:11px 14px;border:none;background:none;color:var(--text2);font:inherit;font-size:.88rem;border-radius:12px;cursor:pointer;transition:all .25s;text-align:right}
+.nav-btn:hover{background:var(--accent-glow);color:var(--text);transform:translateX(-2px)}
+.nav-btn.active{background:linear-gradient(135deg,var(--accent),#7c6cf0);color:#fff;font-weight:600;box-shadow:0 4px 16px rgba(108,92,231,.35)}
+.nav-btn .icon{width:20px;text-align:center;font-size:1.1rem}
+.nav-divider{height:1px;background:rgba(255,255,255,.04);margin:8px 20px}
+.nav-section-label{padding:4px 24px 8px;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.12em}
+.main{flex:1;padding:28px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:12px}
+.topbar h2{font-size:1.5rem;font-weight:700}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.btn{padding:10px 22px;border:none;border-radius:12px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#7c6cf0);color:#fff;box-shadow:0 2px 12px rgba(108,92,231,.3)}.btn-primary:hover{box-shadow:0 4px 20px rgba(108,92,231,.45);transform:translateY(-1px)}
+.btn-success{background:linear-gradient(135deg,var(--success),#00d2a0);color:#fff;box-shadow:0 2px 12px rgba(0,184,148,.3)}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#f0825e);color:#fff}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--accent-glow);color:var(--text);border-color:var(--accent)}
+.btn-sm{padding:7px 16px;font-size:.8rem;border-radius:10px}
+.card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);transition:all .3s}
+.input{width:100%;padding:11px 16px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;font-size:.85rem;transition:all .25s}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.progress-bar{width:100%;height:8px;background:var(--border);border-radius:6px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .5s}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{text-align:center;padding:20px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);transition:all .3s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.stat-card .val{font-size:1.9rem;font-weight:800;color:var(--accent);line-height:1.2}
+.stat-card .lbl{font-size:.75rem;color:var(--text2);margin-top:6px}
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.7rem;font-weight:600}
+.badge-success{background:rgba(0,184,148,.15);color:var(--success);border:1px solid rgba(0,184,148,.2)}
+.badge-danger{background:rgba(225,112,85,.15);color:var(--danger);border:1px solid rgba(225,112,85,.2)}
+.badge-warning{background:rgba(253,203,110,.15);color:var(--warning);border:1px solid rgba(253,203,110,.2)}
+.badge-accent{background:rgba(108,92,231,.15);color:var(--accent);border:1px solid rgba(108,92,231,.2)}
+.hidden{display:none!important}
+.empty{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty .icon{font-size:3rem;margin-bottom:12px;opacity:.5}
+.toast-container{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{padding:14px 28px;border-radius:14px;color:#fff;font-size:.88rem;font-weight:500;pointer-events:auto;animation:slideIn .4s cubic-bezier(.4,0,.2,1);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.toast-success{background:linear-gradient(135deg,var(--success),#00d2a0)}.toast-error{background:linear-gradient(135deg,var(--danger),#f0825e)}.toast-info{background:linear-gradient(135deg,var(--accent),#7c6cf0)}
+@keyframes slideIn{from{opacity:0;transform:translateY(-16px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.theme-toggle{background:none;border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.theme-toggle:hover{background:var(--accent-glow);border-color:var(--accent);transform:rotate(30deg)}
+.hamburger{background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;padding:8px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.hamburger:hover{background:var(--accent-glow)}
+.sidebar:not(.open){transform:translateX(100%)}
+@media(max-width:768px){.sidebar{transform:translateX(100%)}.sidebar.open{transform:translateX(0)}.main{margin-right:0;padding:16px}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+/* ═══ QUIZ STYLES ═══ */
+.quiz-hero{text-align:center;padding:48px 24px;background:linear-gradient(135deg,var(--accent),#764ba2);color:#fff;border-radius:20px;margin-bottom:28px;box-shadow:0 16px 48px rgba(108,92,231,.35)}
+.quiz-hero h2{font-size:2rem;font-weight:800;margin-bottom:10px}
+.quiz-hero p{opacity:.9;font-size:1rem}
+.quiz-section-btn{width:100%;text-align:right;padding:18px;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:16px}
+.quiz-section-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+.quiz-section-btn .sec-icon{font-size:2rem;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quiz-section-btn .sec-info{flex:1}
+.quiz-section-btn .sec-title{font-size:1rem;font-weight:700;margin-bottom:4px}
+.quiz-section-btn .sec-desc{font-size:.8rem;color:var(--text2)}
+.quiz-section-btn .sec-status{font-size:.8rem}
+.question-card{max-width:600px;margin:0 auto 20px}
+.q-number{font-size:.8rem;color:var(--text2);margin-bottom:8px}
+.q-text{font-size:1.1rem;font-weight:600;margin-bottom:16px;line-height:1.8}
+.q-text-en{font-size:1.05rem;color:var(--accent);direction:ltr;text-align:left;margin-bottom:12px;font-weight:600}
+.q-options{display:grid;gap:8px}
+.q-option{width:100%;text-align:left;direction:ltr;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;font-size:.95rem;cursor:pointer;transition:all .25s;text-align:left}
+.q-option:hover{border-color:var(--accent);background:var(--accent-glow)}
+.q-option.selected{border-color:var(--accent);background:rgba(108,92,231,.15);font-weight:600}
+.q-option.correct{border-color:var(--success);background:rgba(0,184,148,.15);color:var(--success)}
+.q-option.wrong{border-color:var(--danger);background:rgba(225,112,85,.15);color:var(--danger)}
+.q-option:disabled{cursor:default;opacity:.8}
+.q-input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;font-size:1rem;direction:ltr;text-align:left;transition:all .25s}
+.q-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.q-explanation{margin-top:12px;padding:12px 16px;background:rgba(0,184,148,.08);border:1px solid rgba(0,184,148,.2);border-radius:10px;font-size:.85rem;color:var(--text);line-height:1.6}
+.q-nav{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+/* ═══ LISTENING ═══ */
+.listen-btn{width:80px;height:80px;border-radius:50%;border:3px solid var(--accent);background:var(--card);color:var(--accent);font-size:2rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.listen-btn:hover{background:var(--accent);color:#fff;transform:scale(1.1);box-shadow:0 4px 20px rgba(108,92,231,.4)}
+.listen-btn.playing{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+/* ═══ RESULTS ═══ */
+.result-hero{text-align:center;padding:48px 24px;border-radius:20px;margin-bottom:28px;position:relative;overflow:hidden}
+.result-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent),#764ba2);z-index:0}
+.result-hero>*{position:relative;z-index:1;color:#fff}
+.level-badge{display:inline-block;padding:12px 32px;border-radius:16px;font-size:2.5rem;font-weight:900;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);margin-bottom:16px}
+.level-label{font-size:1.2rem;font-weight:600;opacity:.9}
+.level-desc{font-size:.9rem;opacity:.75;margin-top:6px}
+.score-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.score-bar .label{width:100px;font-size:.85rem;color:var(--text2);text-align:left;flex-shrink:0}
+.score-bar .bar{flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden}
+.score-bar .fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.score-bar .pct{width:45px;font-size:.85rem;font-weight:700;text-align:center}
+.level-scale{display:flex;gap:4px;margin:20px 0}
+.level-scale .ls-item{flex:1;text-align:center;padding:8px 4px;border-radius:8px;font-size:.7rem;font-weight:600;background:var(--bg);color:var(--text2);border:2px solid transparent;transition:all .3s}
+.level-scale .ls-item.current{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+/* ═══ WRITING ═══ */
+.writing-area{width:100%;min-height:120px;padding:16px;border:2px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;font-size:.95rem;direction:ltr;text-align:left;resize:vertical;line-height:1.8;transition:all .25s}
+.writing-area:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.writing-feedback{margin-top:12px;padding:14px;border-radius:12px;font-size:.85rem;line-height:1.6}
+.writing-feedback.good{background:rgba(0,184,148,.08);border:1px solid rgba(0,184,148,.2)}
+.writing-feedback.moderate{background:rgba(253,203,110,.08);border:1px solid rgba(253,203,110,.2)}
+.writing-feedback.weak{background:rgba(225,112,85,.08);border:1px solid rgba(225,112,85,.2)}
+/* ═══ TIMER ═══ */
+.timer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;font-size:.85rem;color:var(--text2)}
+.timer-bar .time{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.skip-link{position:absolute;top:-100px;left:16px;background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;font-size:.9rem;text-decoration:none;transition:top .2s}
+.skip-link:focus{top:16px}
+</style>
+</head>
+<body>
+<a href="#content" class="skip-link">رد شدن به محتوا</a>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div><h1>🎯 English Quiz</h1><p>تعیین سطح انگلیسی</p></div>
+<button class="theme-toggle" id="themeBtn" type="button" aria-label="تغییر پوسته" style="width:30px;height:30px;font-size:.8rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(255,255,255,.4)">🌙</button>
+</div></div>
+<nav id="nav"></nav>
+<div style="margin-top:auto;padding:16px 24px;border-top:1px solid rgba(255,255,255,.04)"><div style="font-size:.6rem;color:rgba(255,255,255,.15);text-align:center">نسخه ۱.۰ — English Level Test</div></div>
+</aside>
+<main class="main" id="main">
+<div class="topbar"><button class="hamburger" id="hamBtn" type="button" aria-label="منو">☰</button><h2 id="pageTitle"></h2><div class="topbar-actions" id="topActions"></div></div>
+<div id="content"></div>
+</main>
+</div>
+<div class="toast-container" id="toasts" aria-live="polite"></div>
+<script>
+// ═══════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════
+const LS_KEY='englishquiz_v1';
+let currentTab='home';
+let S=loadState();
+
+function defaultState(){return{theme:'dark',results:[],currentTest:null,testHistory:[]}}
+function loadState(){try{const d=localStorage.getItem(LS_KEY);if(!d)return defaultState();return{...defaultState(),...JSON.parse(d)}}catch(e){return defaultState()}}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function toast(msg,type='info'){const c=document.getElementById('toasts');const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3500)}
+
+// ═══════════════════════════════════════════
+// CEFR VOCABULARY DATABASE
+// ═══════════════════════════════════════════
+const CEFR_WORDS={
+A1:[{w:'hello',d:'سلام',pos:'interjection'},{w:'good',d:'خوب',pos:'adjective'},{w:'big',d:'بزرگ',pos:'adjective'},{w:'small',d:'کوچک',pos:'adjective'},{w:'house',d:'خانه',pos:'noun'},{w:'water',d:'آب',pos:'noun'},{w:'food',d:'غذا',pos:'noun'},{w:'book',d:'کتاب',pos:'noun'},{w:'friend',d:'دوست',pos:'noun'},{w:'family',d:'خانواده',pos:'noun'},{w:'mother',d:'مادر',pos:'noun'},{w:'father',d:'پدر',pos:'noun'},{w:'child',d:'کودک',pos:'noun'},{w:'dog',d:'سگ',pos:'noun'},{w:'cat',d:'گربه',pos:'noun'},{w:'eat',d:'خوردن',pos:'verb'},{w:'drink',d:'نوشیدن',pos:'verb'},{w:'go',d:'رفتن',pos:'verb'},{w:'come',d:'آمدن',pos:'verb'},{w:'see',d:'دیدن',pos:'verb'},{w:'make',d:'ساختن',pos:'verb'},{w:'give',d:'دادن',pos:'verb'},{w:'take',d:'گرفتن',pos:'verb'},{w:'have',d:'داشتن',pos:'verb'},{w:'be',d:'بودن',pos:'verb'},{w:'one',d:'یک',pos:'number'},{w:'two',d:'دو',pos:'number'},{w:'three',d:'سه',pos:'number'},{w:'red',d:'قرمز',pos:'adjective'},{w:'blue',d:'آبی',pos:'adjective'},{w:'white',d:'سفید',pos:'adjective'},{w:'black',d:'سیاه',pos:'adjective'},{w:'hot',d:'داغ',pos:'adjective'},{w:'cold',d:'سرد',pos:'adjective'},{w:'new',d:'جدید',pos:'adjective'},{w:'old',d:'قدیمی',pos:'adjective'},{w:'happy',d:'خوشحال',pos:'adjective'},{w:'sad',d:'ناراحت',pos:'adjective'},{w:'car',d:'ماشین',pos:'noun'},{w:'school',d:'مدرسه',pos:'noun'}],
+A2:[{w:'animal',d:'حیوان',pos:'noun'},{w:'answer',d:'جواب',pos:'noun'},{w:'believe',d:'باور کردن',pos:'verb'},{w:'careful',d:'محتاط',pos:'adjective'},{w:'dangerous',d:'خطرناک',pos:'adjective'},{w:'different',d:'متفاوت',pos:'adjective'},{w:'enjoy',d:'لذت بردن',pos:'verb'},{w:'example',d:'مثال',pos:'noun'},{w:'expensive',d:'گران',pos:'adjective'},{w:'important',d:'مهم',pos:'adjective'},{w:'interesting',d:'جالب',pos:'adjective'},{w:'machine',d:'ماشین',pos:'noun'},{w:'natural',d:'طبیعی',pos:'adjective'},{w:'necessary',d:'لازم',pos:'adjective'},{w:'polite',d:'مؤدب',pos:'adjective'},{w:'possible',d:'ممکن',pos:'adjective'},{w:'problem',d:'مشکل',pos:'noun'},{w:'question',d:'سوال',pos:'noun'},{w:'quiet',d:'آرام',pos:'adjective'},{w:'remember',d:'به یاد آوردن',pos:'verb'},{w:'simple',d:'ساده',pos:'adjective'},{w:'special',d:'خاص',pos:'adjective'},{w:'strong',d:'قوی',pos:'adjective'},{w:'suddenly',d:'ناگهان',pos:'adverb'},{w:'tired',d:'خسته',pos:'adjective'},{w:'wonderful',d:' fantastic',pos:'adjective'},{w:'young',d:'جوان',pos:'adjective'},{w:'agree',d:'موافقت کردن',pos:'verb'},{w:'arrive',d:'رسیدن',pos:'verb'},{w:'begin',d:'شروع کردن',pos:'verb'}],
+B1:[{w:'achieve',d:'دستیابی',pos:'verb'},{w:'advantage',d:'مزیت',pos:'noun'},{w:'advice',d:'توصیه',pos:'noun'},{w:'appropriate',d:'مناسب',pos:'adjective'},{w:'atmosphere',d:'جو',pos:'noun'},{w:'behavior',d:'رفتار',pos:'noun'},{w:'communicate',d:'ارتباط برقرار کردن',pos:'verb'},{w:'community',d:'اجتماع',pos:'noun'},{w:'compare',d:'مقایسه کردن',pos:'verb'},{w:'complain',d:'شکایت کردن',pos:'verb'},{w:'complex',d:'پیچیده',pos:'adjective'},{w:'concentrate',d:'تمرکز کردن',pos:'verb'},{w:'consequence',d:'نتیجه',pos:'noun'},{w:'consider',d:'در نظر گرفتن',pos:'verb'},{w:'continue',d:'ادامه دادن',pos:'verb'},{w:'contribute',d:'مشارکت کردن',pos:'verb'},{w:'decision',d:'تصمیم',pos:'noun'},{w:'decrease',d:'کاهش',pos:'verb'},{w:'definitely',d:'قطعاً',pos:'adverb'},{w:'develop',d:'توسعه دادن',pos:'verb'},{w:'dictionary',d:'فرهنگ لغت',pos:'noun'},{w:'education',d:'آموزش',pos:'noun'},{w:'electricity',d:'برق',pos:'noun'},{w:'encourage',d:'تشویق کردن',pos:'verb'},{w:'environment',d:'محیط زیست',pos:'noun'},{w:'equipment',d:'تجهیزات',pos:'noun'},{w:'experience',d:'تجربه',pos:'noun'},{w:'expression',d:'عبارت',pos:'noun'},{w:'foreign',d:'خارجی',pos:'adjective'},{w:'frequent',d:'مکرر',pos:'adjective'}],
+B2:[{w:'accomplish',d:'انجام دادن',pos:'verb'},{w:'acquire',d:'به دست آوردن',pos:'verb'},{w:'adequate',d:'کافی',pos:'adjective'},{w:'advocate',d:'حامی',pos:'noun'},{w:'ambitious',d:'جاه‌طلب',pos:'adjective'},{w:'apparent',d:'آشکار',pos:'adjective'},{w:'approach',d:'رویکرد',pos:'noun'},{w:'assessment',d:'ارزیابی',pos:'noun'},{w:'authority',d:'مقام',pos:'noun'},{w:'beneficial',d:'مفید',pos:'adjective'},{w:'capable',d:'توانمند',pos:'adjective'},{w:'circumstance',d:'شرایط',pos:'noun'},{w:'collapse',d:'فروپاشی',pos:'noun'},{w:'commitment',d:'تعهد',pos:'noun'},{w:'comprehensive',d:'جامع',pos:'adjective'},{w:'conclusion',d:'نتیجه‌گیری',pos:'noun'},{w:'confident',d:'مطمئن',pos:'adjective'},{w:'conscious',d:'آگاه',pos:'adjective'},{w:'controversial',d:'بحث‌برانگیز',pos:'adjective'},{w:'contribute',d:'کمک کردن',pos:'verb'},{w:'convince',d:'متقاعد کردن',pos:'verb'},{w:'criticism',d:'انتقاد',pos:'noun'},{w:'definite',d:'مشخص',pos:'adjective'},{w:'deliberate',d:'عمدی',pos:'adjective'},{w:'demonstrate',d:'نشان دادن',pos:'verb'},{w:'dimension',d:'بُعد',pos:'noun'},{w:'distinct',d:'متمایز',pos:'adjective'},{w:'document',d:'سند',pos:'noun'},{w:'domestic',d:'داخلی',pos:'adjective'},{w:'dramatic',d:'دراماتیک',pos:'adjective'}],
+C1:[{w:'ambiguous',d:'ابهام‌آمیز',pos:'adjective'},{w:'articulate',d:'بیانگر',pos:'adjective'},{w:'assertion',d:'ادعا',pos:'noun'},{w:'coherent',d:'منسجم',pos:'adjective'},{w:'compelling',d:'جذاب',pos:'adjective'},{w:'complementary',d:'مکمل',pos:'adjective'},{w:'comply',d:'رعایت کردن',pos:'verb'},{w:'component',d:'جزء',pos:'noun'},{w:'comprise',d:'شامل شدن',pos:'verb'},{w:'conceive',d:'تصور کردن',pos:'verb'},{w:'concurrent',d:'همزمان',pos:'adjective'},{w:'conducive',d:'ساعد',pos:'adjective'},{w:'conflict',d:'تعارض',pos:'noun'},{w:'connotation',d:'بار معنایی',pos:'noun'},{w:'constrain',d:'محدود کردن',pos:'verb'},{w:'contemplate',d:'تأمل کردن',pos:'verb'},{w:'controversial',d:'بحث‌برانگیز',pos:'adjective'},{w:'conventional',d:'سنتی',pos:'adjective'},{w:'correlate',d:'همبستگی داشتن',pos:'verb'},{w:'correspond',d:'مطابقت داشتن',pos:'verb'},{w:'credible',d:'قابل اعتماد',pos:'adjective'},{w:'criterion',d:'معیار',pos:'noun'},{w:'cumulative',d:'تجمعی',pos:'adjective'},{w:'curtail',d:'محدود کردن',pos:'verb'},{w:'deem',d:'لازم دانستن',pos:'verb'},{w:'deteriorate',d:'بدتر شدن',pos:'verb'},{w:'deviate',d:'انحراف داشتن',pos:'verb'},{w:'differentiate',d:'تمایز قائل شدن',pos:'verb'},{w:'discrepancy',d:'تناقض',pos:'noun'},{w:'disseminate',d:'انتشار دادن',pos:'verb'}],
+C2:[{w:'aberration',d:'انحراف',pos:'noun'},{w:'abstruse',d:'پیچیده',pos:'adjective'},{w:'acquiesce',d:'سکوت و رضایت',pos:'verb'},{w:'admonish',d:'توبیخ کردن',pos:'verb'},{w:'aesthetic',d:'زیبایی‌شناختی',pos:'adjective'},{w:'alleviate',d:'تسکین دادن',pos:'verb'},{w:'amalgamate',d:'ادغام کردن',pos:'verb'},{w:'ameliorate',d:'بهبود بخشیدن',pos:'verb'},{w:'anachronism',d:'ناهمزمانی',pos:'noun'},{w:'anomaly',d:'ناهنجاری',pos:'noun'},{w:'antithetical',d:'متناقض',pos:'adjective'},{w:'apocryphal',d:'جادویی',pos:'adjective'},{w:'approbation',d:'تایید',pos:'noun'},{w:'arbitrary',d:'خودسرانه',pos:'adjective'},{w:'arcane',d:'رازآلود',pos:'adjective'},{w:'arduous',d:'دشوار',pos:'adjective'},{w:'ascetic',d:'زاهدانه',pos:'adjective'},{w:'assiduous',d:'پرتلاش',pos:'adjective'},{w:'astute',d:'زیرک',pos:'adjective'},{w:'auspicious',d:'خوش‌یُمن',pos:'adjective'},{w:'bellicose',d:'جنگ‌طلب',pos:'adjective'},{w:'benevolent',d:'خیرخواه',pos:'adjective'},{w:'capitulate',d:'تسلیم شدن',pos:'verb'},{w:'cajole',d:'uther کردن',pos:'verb'},{w:'candor',d:'صراحت',pos:'noun'},{w:'capricious',d:'لجباز',pos:'adjective'},{w:'circumlocution',d:'دور زدن',pos:'noun'},{w:'clandestine',d:'پنهانی',pos:'adjective'},{w:'coalesce',d:'ادغام شدن',pos:'verb'},{w:'commensurate',d:'متناسب',pos:'adjective'}]
+};
+
+// Grammar questions by level
+const GRAMMAR_QUESTIONS={
+A1:[
+{q:'She ___ a student.',options:['am','is','are','be'],answer:1,explain:'With he/she/it we use "is"'},
+{q:'I ___ two cats.',options:['has','have','having','haves'],answer:1,explain:'With I/you/we/they we use "have"'},
+{q:'They ___ to school every day.',options:['goes','going','go','goed'],answer:2,explain:'With they we use base form "go"'},
+{q:'The book is ___ the table.',options:['in','on','at','to'],answer:1,explain:'We use "on" for surfaces'},
+{q:'___ you like ice cream?',options:['Does','Do','Is','Are'],answer:1,explain:'With "you" we use "do"'},
+{q:'He ___ TV every evening.',options:['watch','watchs','watches','watching'],answer:2,explain:'Third person singular adds -es: watches'},
+{q:'We ___ at 7 o\'clock.',options:['get up','gets up','getting up','got up'],answer:0,explain:'With "we" use base form'},
+{q:'This is ___ apple.',options:['a','an','the','one'],answer:1,explain:'Use "an" before vowel sounds'},
+{q:'She can ___ very fast.',options:['runs','running','run','ran'],answer:2,explain:'After modal verbs use base form'},
+{q:'There ___ many people here.',options:['is','are','has','have'],answer:1,explain:'With plural nouns use "are"'}
+],
+A2:[
+{q:'I have been living here ___ 2019.',options:['for','since','from','in'],answer:1,explain:'Use "since" with a specific point in time'},
+{q:'She is ___ than her sister.',options:['tall','taller','tallest','more tall'],answer:1,explain:'Comparative form: adjective + er'},
+{q:'If it rains, we ___ stay home.',options:['will','would','can','shall'],answer:0,explain:'First conditional: if + present, will + base'},
+{q:'He asked me where I ___.',options:['live','lived','living','am live'],answer:1,explain:'Reported speech: tense shifts back'},
+{q:'The movie was very ___.',options:['boring','bored','bore','boringly'],answer:0,explain:'Use -ing for things that cause feelings'},
+{q:'I would like ___ some coffee.',options:['drink','to drink','drinking','drank'],answer:1,explain:'"Would like" + infinitive (to + verb)'},
+{q:'She has already ___ her homework.',options:['finish','finishes','finished','finishing'],answer:2,explain:'Present perfect: has/have + past participle'},
+{q:'___ going to rain tomorrow.',options:['It\'s','Its','It','There'],answer:0,explain:'"It\'s" = "It is" for predictions'},
+{q:'This is the book ___ I told you about.',options:['who','which','where','when'],answer:1,explain:'Use "which" for things'},
+{q:'He speaks English ___ fluently.',options:['very','much','more','most'],answer:0,explain:'Use "very" before adverbs'}
+],
+B1:[
+{q:'By the time I arrived, they ___.',options:['left','have left','had left','were leaving'],answer:2,explain:'Past perfect: had + past participle for earlier action'},
+{q:'She suggested ___ to the park.',options:['go','to go','going','went'],answer:2,explain:'After "suggested" use gerund (-ing)'},
+{q:'The project must ___ by Friday.',options:['complete','be completed','completing','completed'],answer:1,explain:'Passive infinitive: must be + past participle'},
+{q:'___ it not been for your help, I would have failed.',options:['Had','Has','Have','Having'],answer:0,explain:'Third conditional inversion: Had + subject + past participle'},
+{q:'He insisted ___ paying for dinner.',options:['on','in','at','to'],answer:0,explain:'"Insist on" + gerund'},
+{q:'The report, ___ was published yesterday, shows a decline.',options:['which','who','what','that'],answer:0,explain:'Non-restrictive clause: use "which"'},
+{q:'I wish I ___ more time to travel.',options:['have','had','has','having'],answer:1,explain:'Wish + past tense for present regrets'},
+{q:'She is used to ___ early.',options:['wake','waking','wakes','woken'],answer:1,explain:'"Used to" + gerund (-ing)'},
+{q:'Not until I saw the evidence ___ convinced.',options:['I was','was I','I am','am I'],answer:1,explain:'Negative inversion after "Not until"'},
+{q:'The more you practice, ___ you become.',options:['good','better','the better','the good'],answer:2,explain:'The + comparative, the + comparative'}
+],
+B2:[
+{q:'Had the government acted sooner, the crisis ___ prevented.',options:['could have been','could be','could had been','can be'],answer:0,explain:'Past unreal conditional with modal: could have been + past participle'},
+{q:'The regulations require that every employee ___ a safety course.',options:['takes','take','took','taking'],answer:1,explain:'Subjunctive: require that + base form'},
+{q:'She wouldn\'t have known about the meeting ___ you told her.',options:['if','unless','except','provided'],answer:1,explain:'Unless = if not: Unless you had told her'},
+{q:'Not only ___ the project on time, but she also exceeded expectations.',options:['she delivered','did she deliver','she did deliver','delivering she'],answer:1,explain:'Not only at start requires subject-auxiliary inversion'},
+{q:'The report ___ by the committee raises serious concerns.',options:['being produced','having produced','produced','producing'],answer:2,explain:'Past participle as reduced passive relative clause'},
+{q:'He spoke ___ he were the authority on the subject.',options:['like','as','as if','that'],answer:2,explain:'"As if" + past subjunctive for hypothetical comparison'},
+{q:'___ the circumstances, we have no alternative but to postpone.',options:['Under','In','On','At'],answer:0,explain:'"Under the circumstances" is the fixed expression'},
+{q:'The findings are ___ with the previous research.',options:['consistent','consistence','consisting','consistently'],answer:0,explain:'"Consistent with" — adjective needed after "are"'},
+{q:'___ sufficient evidence, the case was dismissed.',options:['There being','Being','Having','It being'],answer:0,explain:'Absolute participial phrase: There being + noun'},
+{q:'So absorbed ___ in her book that she didn\'t hear the doorbell.',options:['she was','was she','is she','she is'],answer:1,explain:'So + adjective + inversion for emphasis'}
+],
+C1:[
+{q:'___ it not been for your intervention, the project would have failed.',options:['Were','Had','Has','If'],answer:1,explain:'Inverted third conditional: Had + subject + past participle'},
+{q:'The CEO, ___ along with several executives, resigned yesterday.',options:['who','whom','whose','which'],answer:0,explain:'Non-restrictive clause with subject relative pronoun'},
+{q:'The proposal was rejected, ___ was anticipated by many.',options:['which','as','what','that'],answer:1,explain:'"As" for expected/anticipated events'},
+{q:'Scarcely ___ the meeting when the fire alarm went off.',options:['had we started','we had started','did we start','we started'],answer:0,explain:'Scarcely + had + subject + past participle'},
+{q:'The data suggests that the trend ___ continue.',options:['will','would','should','might'],answer:0,explain:'With "suggests" we can use any modal based on certainty level'},
+{q:'___ the fact that the evidence was compelling, the jury acquitted him.',options:['Despite','Notwithstanding','Although','However'],answer:1,explain:'Notwithstanding = in spite of (formal)'},
+{q:'She is the kind of person ___ everyone looks up to.',options:['who','whom','that','which'],answer:0,explain:'Informal English allows "who" as object'},
+{q:'The committee\'s decision, while controversial, is ___ defensible.',options:['entirely','whole','wholly','complete'],answer:0,explain:'Adverb modifying adjective "defensible"'},
+{q:'No sooner ___ the news than celebrations erupted.',options:['they heard','did they hear','they did hear','hear they'],answer:1,explain:'No sooner + had/did + subject + past participle'},
+{q:'The theory ___ forward by the professor has been widely debated.',options:['put','was put','putting','having put'],answer:0,explain:'Reduced passive: put forward (past participle as adjective)'}
+],
+C2:[
+{q:'___ it not been for his profligacy, the family fortune would have endured.',options:['Were','Had','If','Should'],answer:1,explain:'Formal inversion: Had + subject + past participle (third conditional)'},
+{q:'The magnitude of the disaster is such ___ immediate action is imperative.',options:['that','which','as','what'],answer:0,explain:'"Such...that" construction for result clauses'},
+{q:'The defense argued that the prosecution had failed to ___ its case.',options:['substantiate','substantial','substantiating','substantiated'],answer:0,explain:'Infinitive after "failed to" — base form needed'},
+{q:'Not only ___ the infractions, but she also attempted to conceal them.',options:['she committed','did she commit','she did commit','committing she'],answer:1,explain:'Not only...but also with inversion for emphasis'},
+{q:'The witness\'s testimony, ___ it was, left much to be desired.',options:['credible as','as credible','credible though','though credible'],answer:2,explain:'"Credible though it was" — formal concessive inversion'},
+{q:'So-called experts, ___ should know better, are perpetuating this myth.',options:['who','whom','whose','which'],answer:0,explain:'Non-restrictive clause with subject pronoun'},
+{q:'The policy, ___ designed to alleviate poverty, has instead exacerbated it.',options:['ostensibly','ostensible','ostentatious','ostentation'],answer:0,explain:'Adverb modifying the past participle "designed"'},
+{q:'That the hypothesis will be ___ by subsequent research remains doubtful.',options:['borne out','born out','borne of','born of'],answer:0,explain:'"Borne out" = confirmed/proven (passive of "bear out")'},
+{q:'The concept, ___ it may seem paradoxical, is fundamentally sound.',options:['while','whereas','although','however'],answer:0,explain:'"While it may seem" — concessive clause with present subjunctive'},
+{q:'___ the exigencies of the situation, the board opted for pragmatism over principle.',options:['Given','Provided','Supposing','Assuming'],answer:0,explain:'"Given" = considering (formal preposition)'}
+]
+};
+
+// Listening sentences by level
+const LISTENING_SENTENCES={
+A1:['The cat is on the table.','I like to eat pizza.','She is my friend.','The book is red.','We go to school.'],
+A2:['The weather is very cold today.','I have been waiting for two hours.','She decided to take a different route.','The children are playing in the garden.','He asked me a very interesting question.'],
+B1:['Despite the heavy traffic, we managed to arrive on time.','The government has announced new environmental policies.','She has been working on this project since last March.','The conference will be held in the main auditorium.','They would have succeeded if they had tried harder.'],
+B2:['The implications of this research are far-reaching and significant.','Notwithstanding the economic downturn, the company posted record profits.','The committee\'s recommendations will be implemented forthwith.','The phenomenon has been extensively documented in the literature.','Her articulate presentation belied her nervousness.'],
+C1:['The corollary of increased productivity is often reduced workforce satisfaction.','Not only did the experiment fail to substantiate the hypothesis, but it also raised additional questions.','The juxtaposition of traditional and modern elements creates a compelling aesthetic.','The peripheral effects of climate change are increasingly manifest in urban ecosystems.','The preponderance of evidence suggests a causal relationship between the variables.'],
+C2:['The inscrutability of quantum mechanics has perplexed even the most erudite physicists.','The sesquipedalian professor\'s lectures were both illuminating and bewildering.','The inexorable march of technological progress renders certain skills ephemeral.','The dichotomy between theoretical elegance and empirical validation remains unresolved.','The parsimonious interpretation of these data proves more tenable than alternative hypotheses.']
+};
+
+// Writing prompts by level
+const WRITING_PROMPTS={
+A1:['Write a sentence about your family.','Write about what you eat for breakfast.','Write about your best friend.'],
+A2:['Write about your favorite holiday. (2-3 sentences)','Write about what you did last weekend. (2-3 sentences)','Describe your school or workplace. (2-3 sentences)'],
+B1:['Write about the advantages and disadvantages of social media. (4-5 sentences)','Describe a memorable experience from your childhood. (4-5 sentences)','Write about an important goal you have for the future. (4-5 sentences)'],
+B2:['Write a brief argument for or against mandatory volunteering. (5-6 sentences)','Discuss how technology has changed education. (5-6 sentences)','Write about the challenges of living in a globalized world. (5-6 sentences)'],
+C1:['Write a critical analysis of a current social issue. (6-8 sentences)','Discuss the ethical implications of artificial intelligence. (6-8 sentences)','Write about the relationship between language and cultural identity. (6-8 sentences)'],
+C2:['Write an essay arguing for or against the concept of universal basic income. (8-10 sentences)','Discuss the paradox of freedom and responsibility in modern democracies. (8-10 sentences)','Analyze the role of dissent in driving scientific progress. (8-10 sentences)']
+};
+
+// ═══════════════════════════════════════════
+// TEST ENGINE
+// ═══════════════════════════════════════════
+let testState={section:null,questions:[],currentQ:0,answers:[],score:0,startTime:0,timer:null,timeLeft:0,answered:false};
+let results={vocab:0,grammar:0,listening:0,writing:0,level:'',totalScore:0};
+
+function generateTestQuestions(section){
+  const questions=[];
+  if(section==='vocab'){
+    // 8 questions per level, mixed
+    const levels=Object.keys(CEFR_WORDS);
+    levels.forEach(level=>{
+      const words=shuffle(CEFR_WORDS[level]).slice(0,4);
+      words.forEach(w=>{
+        // Get wrong answers from other levels
+        const otherLevels=levels.filter(l=>l!==level);
+        const wrongWords=[];
+        otherLevels.forEach(ol=>{
+          const rnd=shuffle(CEFR_WORDS[ol]).slice(0,2);
+          wrongWords.push(...rnd);
+        });
+        const wrongOptions=shuffle(wrongWords).slice(0,3).map(x=>x.d);
+        if(wrongOptions.length<3)return;
+        const options=shuffle([w.d,...wrongOptions]);
+        questions.push({level,word:w.w,pos:w.pos,question:'معنی کلمه "'+w.w+'" چیست؟',options,answer:options.indexOf(w.d),explain:w.w+' یعنی '+w.d+' ('+w.pos+')'});
+      });
+    });
+    return shuffle(questions).slice(0,30);
+  }
+  if(section==='grammar'){
+    const all=[];
+    Object.keys(GRAMMAR_QUESTIONS).forEach(level=>{
+      GRAMMAR_QUESTIONS[level].forEach(q=>all.push({...q,level}));
+    });
+    return shuffle(all).slice(0,25);
+  }
+  if(section==='listening'){
+    const all=[];
+    Object.keys(LISTENING_SENTENCES).forEach(level=>{
+      LISTENING_SENTENCES[level].forEach(s=>all.push({sentence:s,level}));
+    });
+    return shuffle(all).slice(0,15);
+  }
+  if(section==='writing'){
+    const all=[];
+    Object.keys(WRITING_PROMPTS).forEach(level=>{
+      WRITING_PROMPTS[level].forEach(p=>all.push({prompt:p,level}));
+    });
+    return shuffle(all).slice(0,5);
+  }
+  return questions;
+}
+
+function startTest(section){
+  testState={section,questions:generateTestQuestions(section),currentQ:0,answers:[],score:0,startTime:Date.now(),timer:null,timeLeft:0,answered:false};
+  renderQuizQuestion(document.getElementById('content'));
+}
+
+function calcVocabLevel(score,total){
+  const pct=score/total*100;
+  if(pct>=95)return'C2';if(pct>=85)return'C1';if(pct>=70)return'B2';if(pct>=55)return'B1';if(pct>=35)return'A2';return'A1';
+}
+function calcGrammarLevel(score,total){
+  const pct=score/total*100;
+  if(pct>=90)return'C2';if(pct>=80)return'C1';if(pct>=65)return'B2';if(pct>=50)return'B1';if(pct>=30)return'A2';return'A1';
+}
+function getOverallLevel(levels){
+  const map={A1:1,A2:2,B1:3,B2:4,C1:5,C2:6};
+  const names=['A1','A2','B1','B2','C1','C2'];
+  const vals=levels.filter(v=>v>0);
+  if(!vals.length)return'A1';
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const idx=Math.min(5,Math.max(0,Math.round(avg)-1));
+  return names[idx];
+}
+
+// ═══════════════════════════════════════════
+// SPEECH (TTS)
+// ═══════════════════════════════════════════
+function speak(text,rate=0.85){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US';u.rate=rate;u.pitch=1;
+  const voices=window.speechSynthesis.getVoices();
+  const en=voices.find(v=>v.lang.startsWith('en-US'))||voices.find(v=>v.lang.startsWith('en'));
+  if(en)u.voice=en;
+  window.speechSynthesis.speak(u);
+  return u;
+}
+
+// ═══════════════════════════════════════════
+// WRITING EVALUATOR
+// ═══════════════════════════════════════════
+function evaluateWriting(text,promptLevel){
+  if(!text||text.trim().length<5)return{score:0,feedback:'لطفاً جمله‌ای بنویسید.',level:'A1',class:'weak'};
+  const words=text.trim().split(/\s+/);
+  const wordCount=words.length;
+  let score=0;const tips=[];
+  // Word count check
+  const minWords={A1:3,A2:5,B1:8,B2:10,C1:12,C2:15};
+  if(wordCount>=minWords[promptLevel]||wordCount>=4)score+=20;else tips.push('تعداد کلمات کم است.');
+  // Sentence structure
+  const sentences=text.split(/[.!?]+/).filter(s=>s.trim().length>0);
+  if(sentences.length>=2)score+=20;else tips.push('بیش از یک جمله بنویسید.');
+  // Capitalization
+  if(/^[A-Z]/.test(text.trim()))score+=10;else tips.push('جمله با حرف بزرگ شروع شود.');
+  // Punctuation
+  if(/[.!?]$/.test(text.trim()))score+=10;else tips.push('جمله با نقطه یا علامت سوال تمام شود.');
+  // Advanced vocabulary (simple check)
+  const advancedWords=['however','therefore','furthermore','moreover','consequently','nevertheless','despite','although','whereas','notwithstanding','ubiquitous','paradigm','juxtaposition','ephemeral','articulate'];
+  const hasAdvanced=words.some(w=>advancedWords.includes(w.toLowerCase()));
+  if(hasAdvanced)score+=20;else tips.push('سعی کنید از واژگان پیشرفته‌تر استفاده کنید.');
+  // Complex structures
+  const complexPatterns=/\b(because|although|while|if|when|since|after|before|that|which|who)\b/i;
+  if(complexPatterns.test(text))score+=20;else tips.push('از جملات پیچیده‌تر (شرطی، موصولی) استفاده کنید.');
+  // Spelling (basic)
+  const commonMisspellings=['teh','adn','recieve','seperate','occured','definately','accomodate','embarass','necessery','succesful'];
+  const hasMisspelling=words.some(w=>commonMisspellings.includes(w.toLowerCase()));
+  if(hasMisspelling){score-=10;tip_str='املای بعضی کلمات اشتباه است.';tips.push(tip_str)}
+  score=Math.max(0,Math.min(100,score));
+  let level='A1',cls='weak';
+  if(score>=80){level='C1+';cls='good'}else if(score>=60){level='B2';cls='good'}else if(score>=40){level='B1';cls='moderate'}else{level='A2';cls='weak'}
+  return{score,feedback:tips.length?tips.join(' '):'عالی!',level,class:cls};
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+const NAV_ITEMS=[
+  {id:'home',label:'خانه',icon:'🏠'},
+  {id:'vocab',label:'واژگان',icon:'📖'},
+  {id:'grammar',label:'گرامر',icon:'✏️'},
+  {id:'listening',label:'لیسنینگ',icon:'🎧'},
+  {id:'writing',label:'رایتینگ',icon:'📝'},
+  {id:'results',label:'نتایج',icon:'📊'},
+  {id:'about',label:'درباره',icon:'ℹ️'}
+];
+
+function renderNav(){
+  const nav=document.getElementById('nav');
+  let html='<div class="nav-section-label">آزمون</div>';
+  NAV_ITEMS.forEach(item=>{
+    html+='<button class="nav-btn'+(currentTab===item.id?' active':'')+'" data-tab="'+item.id+'"><span class="icon">'+item.icon+'</span>'+item.label+'</button>';
+  });
+  nav.innerHTML=html;
+  nav.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;render();if(!S.sidebarLocked){document.getElementById('sidebar').classList.remove('open');document.getElementById('main').className='main sidebar-closed'}});
+}
+
+function render(){
+  renderNav();
+  const titles={home:'خانه',vocab:'واژگان',grammar:'گرامر',listening:'لیسنینگ',writing:'رایتینگ',results:'نتایج',about:'درباره'};
+  document.getElementById('pageTitle').textContent=titles[currentTab]||'';
+  const c=document.getElementById('content');
+  const renders={home:renderHome,vocab:renderVocabSection,grammar:renderGrammarSection,listening:renderListeningSection,writing:renderWritingSection,results:renderResults,about:renderAbout};
+  try{(renders[currentTab]||renderHome)(c)}catch(err){console.error(err);c.innerHTML='<div class="card" style="text-align:center;padding:40px"><div class="empty"><div class="icon">⚠️</div><p>خطا در نمایش</p></div></div>';}
+}
+
+// ═══════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════
+function renderHome(c){
+  c.innerHTML=`
+  <div class="quiz-hero">
+    <div style="font-size:3.5rem;margin-bottom:14px">🎯</div>
+    <h2>تعیین سطح انگلیسی</h2>
+    <p>آزمون جامع واژگان، گرامر، لیسنینگ و رایتینگ</p>
+    <p style="opacity:.7;font-size:.85rem;margin-top:8px">بر اساس استاندارد CEFR (A1 — C2)</p>
+  </div>
+
+  <div style="display:grid;gap:12px;margin-bottom:24px">
+    <button class="quiz-section-btn" onclick="currentTab='vocab';render()">
+      <div class="sec-icon" style="background:rgba(108,92,231,.15)">📖</div>
+      <div class="sec-info">
+        <div class="sec-title">واژگان (Vocabulary)</div>
+        <div class="sec-desc">۳۰ سوال چندگزینه‌ای — سطح A1 تا C2</div>
+      </div>
+      <div class="sec-status"><span class="badge badge-accent">۳۰ سوال</span></div>
+    </button>
+    <button class="quiz-section-btn" onclick="currentTab='grammar';render()">
+      <div class="sec-icon" style="background:rgba(0,184,148,.15)">✏️</div>
+      <div class="sec-info">
+        <div class="sec-title">گرامر (Grammar)</div>
+        <div class="sec-desc">۲۵ سوال جای خالی و انتخاب صحیح</div>
+      </div>
+      <div class="sec-status"><span class="badge badge-success">۲۵ سوال</span></div>
+    </button>
+    <button class="quiz-section-btn" onclick="currentTab='listening';render()">
+      <div class="sec-icon" style="background:rgba(253,203,110,.15)">🎧</div>
+      <div class="sec-info">
+        <div class="sec-title">لیسنینگ (Listening)</div>
+        <div class="sec-desc">۱۵ جمله — گوش بده و تایپ کن</div>
+      </div>
+      <div class="sec-status"><span class="badge badge-warning">۱۵ جمله</span></div>
+    </button>
+    <button class="quiz-section-btn" onclick="currentTab='writing';render()">
+      <div class="sec-icon" style="background:rgba(225,112,85,.15)">📝</div>
+      <div class="sec-info">
+        <div class="sec-title">رایتینگ (Writing)</div>
+        <div class="sec-desc">۵ موضوع نویسندگی با بررسی خودکار</div>
+      </div>
+      <div class="sec-status"><span class="badge badge-danger">۵ موضوع</span></div>
+    </button>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <h3 style="margin-bottom:12px">🚀 شروع سریع</h3>
+    <p style="color:var(--text2);font-size:.85rem;margin-bottom:16px">تمام بخش‌ها رو یکجا آزمون بده</p>
+    <button class="btn btn-primary" onclick="startFullTest()">شروع آزمون کامل</button>
+  </div>
+
+  ${S.results.length?`
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:12px">📊 آخرین نتیجه</h3>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="font-size:2.5rem;font-weight:900;color:var(--accent)">${S.results[S.results.length-1].level}</div>
+      <div>
+        <div style="font-size:.85rem;color:var(--text2)">آخرین آزمون: ${new Date(S.results[S.results.length-1].date).toLocaleDateString('fa-IR')}</div>
+        <div style="font-size:.8rem;color:var(--text2)">واژگان: ${S.results[S.results.length-1].vocab}% | گرامر: ${S.results[S.results.length-1].grammar}%</div>
+      </div>
+    </div>
+  </div>`:''}`;
+}
+
+let fullTestState={sections:['vocab','grammar','listening','writing'],current:0,scores:{}};
+function startFullTest(){
+  fullTestState={sections:['vocab','grammar','listening','writing'],current:0,scores:{}};
+  currentTab='vocab';
+  startTest('vocab');
+  toast('آزمون کامل شروع شد! 💪','info');
+}
+
+// ═══════════════════════════════════════════
+// QUIZ QUESTION RENDERER
+// ═══════════════════════════════════════════
+function renderQuizQuestion(c){
+  const s=testState;
+  if(!s.questions.length){c.innerHTML='<div class="card" style="text-align:center;padding:40px"><div class="empty"><div class="icon">📝</div><p>سوالی موجود نیست</p></div></div>';return}
+
+  if(s.currentQ>=s.questions.length){
+    // Section complete
+    finishSection();
+    return;
+  }
+
+  const q=s.questions[s.currentQ];
+  const progress=Math.round((s.currentQ/s.questions.length)*100);
+  const sectionNames={vocab:'واژگان',grammar:'گرامر',listening:'لیسنینگ',writing:'رایتینگ'};
+
+  if(s.section==='listening'){
+    renderListeningQuestion(c,q,s);
+    return;
+  }
+  if(s.section==='writing'){
+    renderWritingQuestion(c,q,s);
+    return;
+  }
+
+  // Multiple choice (vocab & grammar)
+  let html=`
+  <div class="timer-bar">
+    <span>${sectionNames[s.section]} — سوال ${s.currentQ+1} از ${s.questions.length}</span>
+    <span class="time">${Math.round(progress)}%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+  <div class="question-card card">
+    <div class="q-number">سوال ${s.currentQ+1}</div>
+    ${q.level?'<span class="badge badge-accent" style="margin-bottom:8px">'+q.level+'</span>':''}
+    <div class="q-text">${esc(q.question)}</div>
+    <div class="q-options" id="qOptions">
+      ${q.options.map((opt,i)=>'<button class="q-option" data-idx="'+i+'">'+esc(opt)+'</button>').join('')}
+    </div>
+    <div id="qFeedback" style="display:none"></div>
+    <div class="q-nav">
+      <button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>
+    </div>
+  </div>`;
+
+  c.innerHTML=html;
+
+  // Bind options
+  document.querySelectorAll('.q-option').forEach(btn=>{
+    btn.onclick=()=>{
+      if(s.answered)return;
+      s.answered=true;
+      const idx=parseInt(btn.dataset.idx);
+      s.answers.push({qIdx:s.currentQ,answer:idx,correct:idx===q.answer});
+      if(idx===q.answer)s.score++;
+      // Show correct/wrong
+      document.querySelectorAll('.q-option').forEach((b,i)=>{
+        b.disabled=true;
+        if(i===q.answer)b.classList.add('correct');
+        if(i===idx&&idx!==q.answer)b.classList.add('wrong');
+      });
+      // Show explanation
+      const fb=document.getElementById('qFeedback');
+      fb.style.display='block';
+      fb.innerHTML='<div class="q-explanation">'+esc(q.explain)+'</div>';
+      // Auto advance
+      setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},1800);
+    };
+  });
+}
+
+function skipQuestion(){
+  testState.answers.push({qIdx:testState.currentQ,answer:-1,correct:false});
+  testState.currentQ++;
+  testState.answered=false;
+  renderQuizQuestion(document.getElementById('content'));
+}
+
+// ═══════════════════════════════════════════
+// LISTENING QUESTION
+// ═══════════════════════════════════════════
+function renderListeningQuestion(c,q,s){
+  const progress=Math.round((s.currentQ/s.questions.length)*100);
+  let html=`
+  <div class="timer-bar">
+    <span>لیسنینگ — جمله ${s.currentQ+1} از ${s.questions.length}</span>
+    <span class="time">${Math.round(progress)}%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+  <div class="question-card card" style="text-align:center">
+    <div class="q-number">جمله ${s.currentQ+1} — <span class="badge badge-warning">${q.level}</span></div>
+    <div style="margin:20px 0">
+      <button class="listen-btn" id="listenBtn" type="button">🔊</button>
+      <p style="font-size:.8rem;color:var(--text2);margin-top:8px">روی دکمه کلیک کنید تا جمله پخش شود</p>
+    </div>
+    <div style="margin-bottom:16px">
+      <input type="text" class="q-input" id="listenInput" placeholder="جمله را اینجا تایپ کنید..." autocomplete="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-success btn-sm" id="listenCheck">بررسی ✓</button>
+      <button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>
+      <button class="btn btn-ghost btn-sm" id="listenShow">نمایش جواب 👁</button>
+    </div>
+    <div id="listenFeedback" style="display:none;margin-top:16px"></div>
+  </div>`;
+
+  c.innerHTML=html;
+
+  // Play audio
+  const playAudio=()=>speak(q.sentence,0.85);
+  document.getElementById('listenBtn').onclick=playAudio;
+  setTimeout(playAudio,300);
+
+  const input=document.getElementById('listenInput');
+  input.focus();
+
+  // Check answer
+  document.getElementById('listenCheck').onclick=()=>{
+    const userAnswer=input.value.trim().toLowerCase();
+    const correctAnswer=q.sentence.toLowerCase().replace(/[.,!?]/g,'');
+    const similarity=calcSimilarity(userAnswer,correctAnswer.replace(/[.,!?]/g,''));
+    const isCorrect=similarity>=0.7;
+
+    s.answers.push({qIdx:s.currentQ,answer:input.value,correct:isCorrect,similarity});
+    if(isCorrect)s.score++;
+
+    const fb=document.getElementById('listenFeedback');
+    fb.style.display='block';
+    if(isCorrect){
+      fb.innerHTML='<div class="q-explanation" style="background:rgba(0,184,148,.08);border:1px solid rgba(0,184,148,.2)">✅ عالی! <br><strong>'+esc(q.sentence)+'</strong></div>';
+    }else{
+      fb.innerHTML='<div class="q-explanation" style="background:rgba(225,112,85,.08);border:1px solid rgba(225,112,85,.2)">❌ جواب صحیح:<br><strong>'+esc(q.sentence)+'</strong></div>';
+    }
+    input.disabled=true;
+    setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},2500);
+  };
+
+  input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('listenCheck').click()}};
+
+  // Show answer
+  document.getElementById('listenShow').onclick=()=>{
+    s.answers.push({qIdx:s.currentQ,answer:'',correct:false});
+    const fb=document.getElementById('listenFeedback');
+    fb.style.display='block';
+    fb.innerHTML='<div class="q-explanation" style="background:rgba(253,203,110,.08);border:1px solid rgba(253,203,110,.2)">👁 جواب:<br><strong>'+esc(q.sentence)+'</strong></div>';
+    input.disabled=true;
+    setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},2500);
+  };
+}
+
+function calcSimilarity(a,b){
+  if(!a||!b)return 0;
+  const aWords=a.split(/\s+/);
+  const bWords=b.split(/\s+/);
+  let matches=0;
+  aWords.forEach(w=>{if(bWords.includes(w))matches++});
+  return matches/Math.max(aWords.length,bWords.length);
+}
+
+// ═══════════════════════════════════════════
+// WRITING QUESTION
+// ═══════════════════════════════════════════
+function renderWritingQuestion(c,q,s){
+  const progress=Math.round((s.currentQ/s.questions.length)*100);
+  let html=`
+  <div class="timer-bar">
+    <span>رایتینگ — موضوع ${s.currentQ+1} از ${s.questions.length}</span>
+    <span class="time">${Math.round(progress)}%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+  <div class="question-card card">
+    <div class="q-number">موضوع ${s.currentQ+1} — <span class="badge badge-danger">${q.level}</span></div>
+    <div class="q-text" style="direction:ltr;text-align:left">${esc(q.prompt)}</div>
+    <textarea class="writing-area" id="writingInput" placeholder="Type your answer in English..." rows="4"></textarea>
+    <div class="q-nav">
+      <button class="btn btn-success btn-sm" id="writingCheck">بررسی ✓</button>
+      <button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>
+    </div>
+    <div id="writingFeedback" style="display:none"></div>
+  </div>`;
+
+  c.innerHTML=html;
+
+  document.getElementById('writingCheck').onclick=()=>{
+    const text=document.getElementById('writingInput').value;
+    if(!text.trim()){toast('لطفاً چیزی بنویسید','error');return}
+
+    const result=evaluateWriting(text,q.level);
+    s.answers.push({qIdx:s.currentQ,answer:text,correct:result.score>=50,score:result.score});
+    if(result.score>=50)s.score++;
+
+    const fb=document.getElementById('writingFeedback');
+    fb.style.display='block';
+    fb.innerHTML=`<div class="writing-feedback ${result.class}">
+      <div style="font-weight:700;margin-bottom:8px">امتیاز: ${result.score}/100 — سطح: ${result.level}</div>
+      <div>${esc(result.feedback)}</div>
+    </div>`;
+
+    document.getElementById('writingInput').disabled=true;
+    document.getElementById('writingCheck').disabled=true;
+    setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},3000);
+  };
+}
+
+// ═══════════════════════════════════════════
+// SECTION COMPLETE
+// ═══════════════════════════════════════════
+function finishSection(){
+  const s=testState;
+  const total=s.questions.length;
+  const pct=Math.round(s.score/total*100);
+  const sectionNames={vocab:'واژگان',grammar:'گرامر',listening:'لیسنینگ',writing:'رایتینگ'};
+
+  let level='';
+  if(s.section==='vocab')level=calcVocabLevel(s.score,total);
+  else if(s.section==='grammar')level=calcGrammarLevel(s.score,total);
+  else if(s.section==='listening')level=calcVocabLevel(s.score,total);
+  else{
+    // Writing average
+    const writingScores=s.answers.filter(a=>a.score!==undefined).map(a=>a.score);
+    const avg=writingScores.length?writingScores.reduce((a,b)=>a+b,0)/writingScores.length:0;
+    if(avg>=80)level='C1';else if(avg>=60)level='B2';else if(avg>=40)level='B1';else level='A2';
+  }
+
+  results[s.section]=pct;
+
+  // Save result
+  S.results.push({date:new Date().toISOString(),section:s.section,level,score:s.score,total,pct});
+  save();
+
+  const c=document.getElementById('content');
+  c.innerHTML=`
+  <div class="card" style="text-align:center;max-width:500px;margin:40px auto">
+    <div style="font-size:3rem;margin-bottom:16px">🎉</div>
+    <h2 style="margin-bottom:8px">${sectionNames[s.section]} تمام شد!</h2>
+    <div style="font-size:3rem;font-weight:900;color:var(--accent);margin:16px 0">${level}</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="val">${s.score}/${total}</div><div class="lbl">پاسخ صحیح</div></div>
+      <div class="stat-card"><div class="val">${pct}%</div><div class="lbl">درصد</div></div>
+    </div>
+    <div class="q-nav" style="margin-top:20px">
+      <button class="btn btn-primary" onclick="currentTab='home';render()">بازگشت به خانه</button>
+      <button class="btn btn-ghost" onclick="currentTab='results';render()">مشاهده نتایج</button>
+    </div>
+  </div>`;
+
+  // Check if full test
+  if(fullTestState.current<fullTestState.sections.length-1){
+    fullTestState.scores[s.section]=pct;
+    fullTestState.current++;
+    const nextSection=fullTestState.sections[fullTestState.current];
+    setTimeout(()=>{
+      currentTab=nextSection;
+      startTest(nextSection);
+      toast('بخش بعدی: '+sectionNames[nextSection],'info');
+    },2000);
+  }else{
+    fullTestState.scores[s.section]=pct;
+    // Calculate overall
+    const levels=Object.values(fullTestState.scores).map(v=>v);
+    results.totalScore=Math.round(levels.reduce((a,b)=>a+b,0)/levels.length);
+    toast('آزمون کامل تمام شد! 🎉','success');
+  }
+}
+
+// ═══════════════════════════════════════════
+// SECTION STUBS
+// ═══════════════════════════════════════════
+function renderVocabSection(c){startTest('vocab')}
+function renderGrammarSection(c){startTest('grammar')}
+function renderListeningSection(c){startTest('listening')}
+function renderWritingSection(c){startTest('writing')}
+
+// ═══════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════
+function renderResults(c){
+  const history=S.results.slice(-20);
+  if(!history.length){c.innerHTML='<div class="card" style="text-align:center;padding:60px"><div class="empty"><div class="icon">📊</div><p>هنوز آزمونی نداده‌اید</p><button class="btn btn-primary" style="margin-top:16px" onclick="currentTab=\'home\';render()">شروع آزمون</button></div></div>';return}
+
+  // Get latest scores by section
+  const latest={};
+  history.reverse().forEach(r=>{if(!latest[r.section])latest[r.section]=r});
+
+  const levels={A1:1,A2:2,B1:3,B2:4,C1:5,C2:6};
+  const sectionNames={vocab:'واژگان',grammar:'گرامر',listening:'لیسنینگ',writing:'رایتینگ'};
+  const sectionColors={vocab:'var(--accent)',grammar:'var(--success)',listening:'var(--warning)',writing:'var(--danger)'};
+
+  // Calculate overall level
+  const scores=Object.values(latest).map(r=>r.pct);
+  const avgScore=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+  let overallLevel='A1';
+  if(avgScore>=90)overallLevel='C2';else if(avgScore>=80)overallLevel='C1';else if(avgScore>=65)overallLevel='B2';else if(avgScore>=50)overallLevel='B1';else if(avgScore>=35)overallLevel='A2';
+
+  const levelDescs={A1:'مبتدی — Basic',A2:'.Elementary',B1:'متوسط — Intermediate',B2:'فوق متوسط — Upper-Intermediate',C1:'پیشرفته — Advanced',C2:'ماهر — Proficient'};
+
+  let html=`
+  <div class="result-hero">
+    <div class="level-badge">${overallLevel}</div>
+    <div class="level-label">${levelDescs[overallLevel]}</div>
+    <div class="level-desc">میانگین امتیاز: ${avgScore}%</div>
+  </div>
+
+  <div class="level-scale">
+    ${['A1','A2','B1','B2','C1','C2'].map(l=>'<div class="ls-item'+(l===overallLevel?' current':'')+'">'+l+'</div>').join('')}
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <h3 style="margin-bottom:16px">📊 نتایج بخش‌ها</h3>
+    ${Object.keys(sectionNames).map(sec=>{
+      const r=latest[sec];
+      if(!r)return'';
+      return`<div class="score-bar">
+        <div class="label">${sectionNames[sec]}</div>
+        <div class="bar"><div class="fill" style="width:${r.pct}%;background:${sectionColors[sec]}"></div></div>
+        <div class="pct" style="color:${sectionColors[sec]}">${r.pct}%</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:16px">📜 تاریخچه آزمون‌ها</h3>
+    <div style="max-height:400px;overflow-y:auto">
+      ${history.map(r=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--border)">
+          <span class="badge badge-accent">${r.level}</span>
+          <span style="font-size:.85rem;color:var(--text2)">${sectionNames[r.section]||r.section}</span>
+          <span style="font-size:.85rem;font-weight:700">${r.pct}%</span>
+          <span style="font-size:.75rem;color:var(--text2);margin-right:auto">${new Date(r.date).toLocaleDateString('fa-IR')}</span>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+
+  c.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// ABOUT
+// ═══════════════════════════════════════════
+function renderAbout(c){
+  c.innerHTML=`
+  <div style="max-width:700px;margin:0 auto">
+    <div class="quiz-hero">
+      <div style="font-size:3rem;margin-bottom:12px">🎯</div>
+      <h2>English Level Test</h2>
+      <p>تعیین سطح انگلیسی — نسخه ۱.۰</p>
+      <p style="opacity:.7;font-size:.85rem;margin-top:6px">بر اساس استاندارد CEFR</p>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="margin-bottom:12px">🎯 درباره این آزمون</h3>
+      <p style="color:var(--text2);font-size:.9rem;line-height:1.8">
+        این آزمون بر اساس استاندارد <strong>CEFR</strong> (Common European Framework of Reference for Languages) طراحی شده
+        و سطح زبانی شما را در ۴ بخش ارزیابی می‌کند:
+      </p>
+      <div style="display:grid;gap:8px;margin-top:16px">
+        <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--accent)">
+          <strong>📖 واژگان</strong>
+          <p style="color:var(--text2);font-size:.8rem">۳۰ سوال از سطح A1 تا C2</p>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--success)">
+          <strong>✏️ گرامر</strong>
+          <p style="color:var(--text2);font-size:.8rem">۲۵ سوال دستور زبان</p>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--warning)">
+          <strong>🎧 لیسنینگ</strong>
+          <p style="color:var(--text2);font-size:.8rem">۱۵ جمله شنیداری با تبدیل متن به صدا</p>
+        </div>
+        <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--danger)">
+          <strong>📝 رایتینگ</strong>
+          <p style="color:var(--text2);font-size:.8rem">۵ موضوع نویسندگی با بررسی خودکار</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="margin-bottom:12px">📊 سطوح CEFR</h3>
+      <div style="display:grid;gap:8px">
+        ${[['A1','مبتدی — شروع یادگیری'],['A2','ابتدایی — جملات ساده'],['B1','متوسط — مکالمه روزمره'],['B2','فوق متوسط — متون پیچیده'],['C1','پیشرفته — تسلط نزدیک به حرفه‌ای'],['C2','ماهر — تسلط کامل']].map(([l,d])=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg);border-radius:8px">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c6cf0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem">${l}</div>
+            <div style="font-size:.85rem">${d}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <p style="color:var(--text2);font-size:.85rem">ساخته شده با ❤️</p>
+      <p style="color:var(--text2);font-size:.75rem;margin-top:4px">English Level Test v1.0</p>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════
+document.getElementById('themeBtn').onclick=()=>{
+  const html=document.documentElement;
+  const current=html.getAttribute('data-theme');
+  const next=current==='dark'?'light':'dark';
+  html.setAttribute('data-theme',next);
+  S.theme=next;
+  document.getElementById('themeBtn').textContent=next==='dark'?'🌙':'☀️';
+  save();
+};
+
+// ═══════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════
+document.getElementById('hamBtn').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
+document.addEventListener('click',e=>{if(!e.target.closest('.sidebar')&&!e.target.closest('.hamburger'))document.getElementById('sidebar').classList.remove('open')});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+if(S.theme){document.documentElement.setAttribute('data-theme',S.theme);document.getElementById('themeBtn').textContent=S.theme==='dark'?'🌙':'☀️'}
+window.speechSynthesis?.getVoices(); // Pre-load voices
+render();
+</script>
+</body>
+</html>
