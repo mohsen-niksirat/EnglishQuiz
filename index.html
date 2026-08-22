@@ -12,7 +12,7 @@
 :root{--bg:#0f1117;--bg2:#161822;--card:#1e2030;--card-hover:#262940;--border:#353a54;--text:#f0f2f5;--text2:#b0b8cc;--accent:#7c6cf0;--accent2:#b4a8ff;--accent-glow:rgba(124,108,240,.2);--success:#2dd4a0;--danger:#f0825e;--warning:#fdd663;--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.5);--shadow-sm:0 2px 8px rgba(0,0,0,.3);--font:'Vazirmatn',system-ui,sans-serif}
 [data-theme="light"]{--bg:#f0f2f5;--bg2:#ffffff;--card:#ffffff;--card-hover:#f5f6fa;--border:#d0d5e0;--text:#1a1d27;--text2:#4a5068;--accent:#6c5ce7;--accent2:#a29bfe;--success:#00a884;--danger:#e17055;--warning:#e6a817;--shadow:0 4px 24px rgba(0,0,0,.08);--shadow-sm:0 2px 8px rgba(0,0,0,.05);--accent-glow:rgba(108,92,231,.12)}
 html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
-.app{min-height:100vh;padding-bottom:60px}
+.app{min-height:100vh;padding-bottom:72px}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
 .topbar h2{font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px}
 .topbar-actions{display:flex;gap:8px;align-items:center}
@@ -111,24 +111,43 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .timer-bar .time{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .skip-link{position:absolute;top:-100px;left:16px;background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;font-size:.9rem;text-decoration:none;transition:top .2s}
 .skip-link:focus{top:16px}
+/* ═══ TOP HEADER ═══ */
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+.app-header h2{font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:6px}
+.app-test-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+/* ═══ BOTTOM NAV ═══ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:6px 0 max(6px,env(safe-area-inset-bottom));backdrop-filter:blur(8px)}
+.bottom-nav-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 16px;border:none;background:none;color:var(--text2);font:inherit;font-size:.7rem;font-weight:500;cursor:pointer;border-radius:10px;transition:all .2s;min-width:64px}
+.bottom-nav-tab .nav-icon{font-size:1.3rem;line-height:1}
+.bottom-nav-tab.active{color:var(--accent);background:var(--accent-glow)}
+.bottom-nav-tab:hover{color:var(--accent)}
+@media(min-width:768px){.bottom-nav-tab{min-width:80px;font-size:.75rem;padding:8px 20px}}
 </style>
 </head>
 <body>
 <a href="#content" class="skip-link">رد شدن به محتوا</a>
-<div class="app">
 <div class="app" id="app">
-<div class="topbar">
+<div class="app-header" id="appHeader">
+  <h2>🎯 تعیین سطح انگلیسی</h2>
+  <button class="theme-toggle" id="themeBtn" type="button" aria-label="تغییر پوسته" style="width:32px;height:32px;font-size:.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text)">🌙</button>
+</div>
+<div class="app-test-topbar" id="testTopbar" style="display:none">
   <div style="display:flex;align-items:center;gap:8px">
-    <button class="back-btn" id="backBtn" type="button" style="display:none" aria-label="بازگشت">→</button>
-    <h2 id="pageTitle">🎯 تعیین سطح</h2>
+    <button class="back-btn" id="backBtn" type="button" aria-label="بازگشت">→</button>
+    <h2 id="pageTitle" style="font-size:1.05rem;font-weight:700">🎯 تعیین سطح</h2>
   </div>
-  <div class="topbar-actions">
-    <button class="theme-toggle" id="themeBtn" type="button" aria-label="تغییر پوسته" style="width:32px;height:32px;font-size:.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text)">🌙</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="theme-toggle" id="themeBtn2" type="button" aria-label="تغییر پوسته" style="width:32px;height:32px;font-size:.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text)">🌙</button>
   </div>
 </div>
 <main class="main">
 <div id="content"></div>
 </main>
+</div>
+<div class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-tab active" data-tab="home"><span class="nav-icon">🏠</span><span>خانه</span></button>
+  <button class="bottom-nav-tab" data-tab="results"><span class="nav-icon">📊</span><span>نتایج</span></button>
+  <button class="bottom-nav-tab" data-tab="about"><span class="nav-icon">ℹ️</span><span>درباره</span></button>
 </div>
 <div class="toast-container" id="toasts" aria-live="polite"></div>
 <script>
@@ -451,11 +470,21 @@ const titles={home:'🎯 تعیین سطح',vocab:'📖 واژگان',grammar:'�
 const homeTabs=new Set(['home','results','about']);
 
 function render(){
-  // Update back button
-  const backBtn=document.getElementById('backBtn');
-  if(backBtn)backBtn.style.display=homeTabs.has(currentTab)?'none':'flex';
-  // Update title
-  document.getElementById('pageTitle').textContent=titles[currentTab]||'🎯 تعیین سطح';
+  const isHomeTab=homeTabs.has(currentTab);
+  // Show/hide nav bar
+  const appHeader=document.getElementById('appHeader');
+  const bottomNav=document.getElementById('bottomNav');
+  const testTopbar=document.getElementById('testTopbar');
+  if(appHeader)appHeader.style.display=isHomeTab?'flex':'none';
+  if(bottomNav)bottomNav.style.display=isHomeTab?'flex':'none';
+  if(testTopbar)testTopbar.style.display=isHomeTab?'none':'flex';
+  // Update active tab
+  document.querySelectorAll('.bottom-nav-tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.tab===currentTab);
+  });
+  // Update page title for test pages
+  const pageTitle=document.getElementById('pageTitle');
+  if(pageTitle)pageTitle.textContent=titles[currentTab]||'🎯 تعیین سطح';
   const c=document.getElementById('content');
   const renders={home:renderHome,vocab:renderVocabSection,grammar:renderGrammarSection,listening:renderListeningSection,writing:renderWritingSection,results:renderResults,about:renderAbout};
   try{(renders[currentTab]||renderHome)(c)}catch(err){console.error(err);c.innerHTML='<div class="card" style="text-align:center;padding:40px"><div class="empty"><div class="icon">⚠️</div><p>خطا در نمایش</p></div></div>';}
@@ -466,11 +495,6 @@ function render(){
 // ═══════════════════════════════════════════
 function renderHome(c){
   c.innerHTML=`
-  <div class="quiz-hero">
-    <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:4px">🎯 تعیین سطح انگلیسی</h2>
-    <p style="font-size:.85rem;opacity:.9">آزمون واژگان، گرامر، لیسنینگ و رایتینگ — CEFR (A1-C2)</p>
-  </div>
-
   <div style="display:grid;gap:12px;margin-bottom:24px">
     <button class="quiz-section-btn" onclick="navigateTo('vocab')">
       <div class="sec-icon" style="background:rgba(108,92,231,.15)">📖</div>
@@ -1043,6 +1067,8 @@ document.getElementById('themeBtn').onclick=()=>{
   html.setAttribute('data-theme',next);
   S.theme=next;
   document.getElementById('themeBtn').textContent=next==='dark'?'🌙':'☀️';
+  const tb2=document.getElementById('themeBtn2');
+  if(tb2)tb2.textContent=next==='dark'?'🌙':'☀️';
   save();
 };
 
@@ -1050,11 +1076,27 @@ document.getElementById('themeBtn').onclick=()=>{
 // SIDEBAR
 // ═══════════════════════════════════════════
 document.getElementById('backBtn').onclick=goBack;
+// ═══ NAV TABS ═══
+document.querySelectorAll('.bottom-nav-tab').forEach(tab=>{
+  tab.onclick=()=>navigateTo(tab.dataset.tab);
+});
+// ═══ TEST TOPBAR THEME BTN ═══
+document.getElementById('themeBtn2')?.addEventListener('click',()=>{
+  const html=document.documentElement;
+  const current=html.getAttribute('data-theme');
+  const next=current==='dark'?'light':'dark';
+  html.setAttribute('data-theme',next);
+  S.theme=next;
+  document.getElementById('themeBtn').textContent=next==='dark'?'🌙':'☀️';
+  const tb2=document.getElementById('themeBtn2');
+  if(tb2)tb2.textContent=next==='dark'?'🌙':'☀️';
+  save();
+});
 
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-if(S.theme){document.documentElement.setAttribute('data-theme',S.theme);document.getElementById('themeBtn').textContent=S.theme==='dark'?'🌙':'☀️'}
+if(S.theme){document.documentElement.setAttribute('data-theme',S.theme);const txt=S.theme==='dark'?'🌙':'☀️';document.getElementById('themeBtn').textContent=txt;const tb2=document.getElementById('themeBtn2');if(tb2)tb2.textContent=txt}
 window.speechSynthesis?.getVoices(); // Pre-load voices
 // Check HTTPS for Speech API
 if(location.protocol!=='https:'&&location.hostname!=='127.0.0.1'&&location.hostname!=='localhost'){
