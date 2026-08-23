@@ -911,8 +911,9 @@ function finishSection(){
       <div class="stat-card"><div class="val" style="font-size:1.5rem">${fmtTime(sec)}</div><div class="lbl">⏱ زمان</div></div>
     </div>
     <div class="q-nav" style="margin-top:20px">
-      <button class="btn btn-primary" onclick="currentTab='home';navHistory=['home'];render()">بازگشت به خانه</button>
+      <button class="btn btn-primary" onclick="showReview()">📋 مشاهده جواب‌ها</button>
       <button class="btn btn-ghost" onclick="navigateTo('results')">مشاهده نتایج</button>
+      <button class="btn btn-ghost" onclick="currentTab='home';navHistory=['home'];render()">بازگشت به خانه</button>
     </div>
   </div>`;
 
