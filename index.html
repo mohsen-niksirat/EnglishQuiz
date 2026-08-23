@@ -116,6 +116,8 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .q-feedback{margin-top:12px}
 .feed-ok{padding:10px 14px;border-radius:10px;background:rgba(0,184,148,.1);border:1px solid rgba(0,184,148,.3);color:var(--success);font-size:.85rem;margin-bottom:8px}
 .feed-bad{padding:10px 14px;border-radius:10px;background:rgba(225,112,85,.1);border:1px solid rgba(225,112,85,.3);color:var(--danger);font-size:.85rem;margin-bottom:8px}
+.deep-box{margin-top:10px;padding:12px 14px;border-radius:10px;background:var(--bg);border:1px dashed var(--border);font-size:.8rem;line-height:1.8}
+.deep-row{margin-bottom:4px}
 /* ═══ TIMER ═══ */
 .timer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;font-size:.85rem;color:var(--text2);font-weight:500}
 .timer-bar .time{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -351,6 +353,59 @@ function rampOrder(questions){
     .sort((a,b)=>a.key-b.key)
     .map(x=>x.q);
 }
+function deepExplain(q){
+  const s=testState;
+  if(!q)return'';
+  if(s.section==='vocab'){
+    const posF={noun:['اسم (Noun)','اسم‌ها برای نامیدن اشخاص، اشیا، مکان‌ها و مفاهیم به کار می‌روند؛ معمولاً با a/an/the همراه می‌شوند و می‌توانند فاعل یا مفعول جمله باشند.'],
+      verb:['فعل (Verb)','افعال عمل یا حالت را بیان می‌کنند؛ بعد از فاعل می‌آیند و با توجه به زمان و شخص صرف می‌شوند.'],
+      adjective:['صفت (Adjective)','صفت‌ها اسم را توصیف می‌کنند؛ قبل از اسم یا بعد از فعل to be (is/am/are) می‌آیند.'],
+      adverb:['قید (Adverb)','قیدها فعل، صفت یا قید دیگری را توصیف می‌کنند و معمولاً به -ly ختم می‌شوند.'],
+      number:['عدد (Number)','اعداد برای شمارش و ترتیب استفاده می‌شوند.'],
+      interjection:['حرف ندا (Interjection)','حروف ندا احساسات یا واکنش‌ها را بیان می‌کنند (مثل Hello! / Wow!).']};
+    const p=posF[q.pos]||['',''];
+    return '<div class="deep-row"><b>'+esc(q.word)+'</b> — '+p[0]+'</div>'+
+      '<div class="deep-row">معنی: <b>'+esc(q.options[q.answer])+'</b></div>'+
+      '<div class="deep-row">'+p[1]+'</div>';
+  }
+  if(s.section==='grammar')return grammarDeep(q);
+  if(s.section==='listening'){
+    const tips={A1:'جملات کوتاه و ساده با ساختار فاعل + فعل + مفعول.',A2:'زمان‌های پایه (گذشته ساده، حال کامل) و توصیف‌های روزمره.',B1:'جملات مرکب با حروف ربط (despite, although, because).',B2:'ساختارهای رسمی‌تر و عبارات قیدی پیشرفته.',C1:'جملات پیچیده با وارونگی و واژگان سطح بالا.',C2:'جملات بسیار رسمی و آکادمیک با واژگان تخصصی.'};
+    return '<div class="deep-row">جمله درست: <b style="direction:ltr">'+esc(q.sentence)+'</b></div>'+
+      '<div class="deep-row">نکته سطح '+q.level+': '+(tips[q.level]||'')+'</div>';
+  }
+  if(s.section==='writing'){
+    const a=s.answers[s.currentQ];
+    const d=a&&a.details;
+    let out='<div class="deep-row">این موضوع نیازمند پاسخ ۵ تا ۱۰ جمله‌ای منسجم است: مقدمه، بدنه و نتیجه‌گیری.</div>';
+    if(d)out+='<div class="deep-row">واژگان: <b>'+d.vocab+'</b> | گرامر: <b>'+d.grammar+'</b> | ساختار: <b>'+d.structure+'</b></div>';
+    out+='<div class="deep-row">نکته: از کلمات ربط (however, therefore, although) و ساختارهای متنوع استفاده کنید.</div>';
+    return out;
+  }
+  return'<div class="deep-row">'+esc(q.explain||'')+'</div>';
+}
+function grammarDeep(q){
+  const t=(q.explain||'').toLowerCase();
+  const rules=[];
+  if(/conditional|if i|if it|if she|if he|if they|if we|would have/.test(t))rules.push('شرطی‌ها: نوع صفر (If + حال ساده، حال ساده)، نوع اول (If + حال، will + فعل)، نوع دوم (If + گذشته، would + فعل)، نوع سوم (If + گذشته کامل، would have + قسمت سوم)');
+  if(/inversion|not until|scarcely|no sooner|rarely|little|only after|under no|so \+|had it|were it/.test(t))rules.push('وارونگی: وقتی جمله با قید منفی یا So/Only شروع شود، فعل کمکی قبل از فاعل می‌آید (مثل "Not only did she…" یا "Rarely have we…")');
+  if(/subjunctive|insisted that|require that|suggested that|proposed that/.test(t))rules.push('التزامی (Subjunctive): بعد از insist/require/suggest + that، فعل بدون s/es به شکل پایه می‌آید.');
+  if(/relative|who|which|whose|where|whom/.test(t))rules.push('ضمایر موصولی: who برای شخص، which برای چیز، where برای مکان، whose برای مالکیت، whom برای مفعول.');
+  if(/reported/.test(t))rules.push('گزارش غیرمستقیم (Reported Speech): زمان فعل یک پله به عقب می‌رود (حال → گذشته، گذشته → گذشته کامل).');
+  if(/passive|be \+|been/.test(t))rules.push('مجهول (Passive): فعل to be + قسمت سوم فعل. وقتی روی خودِ عمل تأکید است به‌جای فاعل استفاده می‌شود.');
+  if(/comparative|taller|better|the more|the better/.test(t))rules.push('تفضیلی (Comparative): صفت + er یا more + صفت. ساختار "The + تفضیلی، the + تفضیلی" رابطه علت و معلولی را نشان می‌دهد.');
+  if(/since|for|preposition|in|on|at|under the/.test(t))rules.push('حروف اضافه: since + نقطه شروع، for + مدت زمان، in + مکان/سال، on + سطح/روز، at + ساعت/نقطه.');
+  if(/modal|can|must|should|would|will/.test(t))rules.push('افعال کمکی (Modals): can (توانایی)، must (الزام)، should (توصیه)، would (شرطی/مودبانه). بعد از همه فعل به شکل پایه می‌آید.');
+  if(/perfect|have \+|has \+|had \+/.test(t))rules.push('زمان‌های کامل: حال کامل (have/has + قسمت سوم) برای تجربه تا حالا، گذشته کامل (had + قسمت سوم) برای عملِ قبل از عمل دیگر در گذشته، آینده کامل (will have + قسمت سوم) برای عملِ تمام‌شده تا زمانی در آینده.');
+  if(/gerund|used to|suggested|insist on|infinitive|to \+ verb|would like/.test(t))rules.push('Gerund و Infinitive: بعد از suggest/enjoy/mind فعل + ing می‌آید؛ بعد از want/would like/decide فعل با to می‌آید.');
+  if(rules.length)return rules.map(r=>'<div class="deep-row">• '+r+'</div>').join('');
+  return '<div class="deep-row">قاعده: '+esc(q.explain||'')+'</div><div class="deep-row">این ساختار را در جمله‌های خودتان تمرین کنید تا ملکه ذهنتان شود.</div>';
+}
+function levelListenTip(level){
+  const tips={A1:'جملات کوتاه و ساده.',A2:'زمان‌های پایه و توصیف روزمره.',B1:'جملات مرکب با حروف ربط.',B2:'ساختار رسمی و قید پیشرفته.',C1:'جملات پیچیده و وارونگی.',C2:'زبان آکادمیک و واژگان تخصصی.'};
+  return tips[level]||'';
+}
+
 function markSeen(){
   const s=testState;
   if(!s||!s.section)return;
@@ -691,9 +746,11 @@ function renderQuizQuestion(c){
         // Immediate feedback + manual next
         const fb=document.getElementById('qFeedback');
         if(fb){
-          fb.innerHTML=isCorrect
+          fb.innerHTML=(isCorrect
             ?'<div class="feed-ok">✅ درست! '+esc(q.explain||'')+'</div>'
-            :'<div class="feed-bad">❌ نادرست — جواب درست: <strong>'+esc(q.options[q.answer])+'</strong></div><div class="q-explanation">'+esc(q.explain||'')+'</div>';
+            :'<div class="feed-bad">❌ نادرست — جواب درست: <strong>'+esc(q.options[q.answer])+'</strong></div><div class="q-explanation">'+esc(q.explain||'')+'</div>')+'<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="deepBtn">📖 مرور توضیح</button></div><div class="deep-box" id="deepBox" style="display:none">'+deepExplain(q)+'</div>';
+          const db=document.getElementById('deepBtn');
+          if(db)db.onclick=()=>{const bx=document.getElementById('deepBox');if(bx)bx.style.display=bx.style.display==='none'?'block':'none'};
         }
         const nb=document.getElementById('qNextBtn');
         if(nb){
@@ -887,7 +944,9 @@ function renderListeningQuestion(c,q,s){
     if(s.mode==='practice'){
       const fb=document.getElementById('qFeedback');
       if(fb){
-        fb.innerHTML=(isCorrect?'<div class="feed-ok">✅ درست!</div>':'<div class="feed-bad">❌ نادرست</div>')+'<div class="q-explanation">جمله درست: <strong style="direction:ltr">'+esc(q.sentence)+'</strong></div>';
+        fb.innerHTML=(isCorrect?'<div class="feed-ok">✅ درست!</div>':'<div class="feed-bad">❌ نادرست</div>')+'<div class="q-explanation">جمله درست: <strong style="direction:ltr">'+esc(q.sentence)+'</strong></div>'+'<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="deepBtn">📖 مرور توضیح</button></div><div class="deep-box" id="deepBox" style="display:none">'+deepExplain(q)+'</div>';
+        const db=document.getElementById('deepBtn');
+        if(db)db.onclick=()=>{const bx=document.getElementById('deepBox');if(bx)bx.style.display=bx.style.display==='none'?'block':'none'};
       }
       const nb=document.getElementById('listenNext');
       if(nb){
@@ -945,7 +1004,7 @@ function renderWritingQuestion(c,q,s){
     const text=document.getElementById('writingInput').value;
     if(!text.trim()){toast('لطفاً چیزی بنویسید','error');return}
     const result=evaluateWriting(text,q.level);
-    s.answers[s.currentQ]={qIdx:s.currentQ,answer:text,correct:result.score>=50,score:result.score};
+    s.answers[s.currentQ]={qIdx:s.currentQ,answer:text,correct:result.score>=50,score:result.score,details:result.details};
     recalcScore();
     s.answered=true;
     document.getElementById('writingInput').disabled=true;
@@ -953,7 +1012,9 @@ function renderWritingQuestion(c,q,s){
     if(s.mode==='practice'){
       const fb=document.getElementById('qFeedback');
       if(fb){
-        fb.innerHTML=(result.score>=50?'<div class="feed-ok">✅ امتیاز: '+result.score+'/100</div>':'<div class="feed-bad">❌ امتیاز: '+result.score+'/100 — '+esc(result.feedback||'')+'</div>');
+        fb.innerHTML=(result.score>=50?'<div class="feed-ok">✅ امتیاز: '+result.score+'/100</div>':'<div class="feed-bad">❌ امتیاز: '+result.score+'/100 — '+esc(result.feedback||'')+'</div>')+'<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="deepBtn">📖 مرور توضیح</button></div><div class="deep-box" id="deepBox" style="display:none">'+deepExplain(q)+'</div>';
+        const db=document.getElementById('deepBtn');
+        if(db)db.onclick=()=>{const bx=document.getElementById('deepBox');if(bx)bx.style.display=bx.style.display==='none'?'block':'none'};
       }
       const nb=document.getElementById('writingNext');
       if(nb){
