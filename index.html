@@ -106,6 +106,10 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .writing-feedback.good{background:rgba(0,184,148,.08);border:1px solid rgba(0,184,148,.2)}
 .writing-feedback.moderate{background:rgba(253,203,110,.08);border:1px solid rgba(253,203,110,.2)}
 .writing-feedback.weak{background:rgba(225,112,85,.08);border:1px solid rgba(225,112,85,.2)}
+/* ═══ REVIEW OPTIONS ═══ */
+.review-opt{padding:8px 12px;border-radius:8px;border:1px solid var(--border);font-size:.85rem;direction:ltr;text-align:left;margin-bottom:6px}
+.review-opt.correct{border-color:var(--success);background:rgba(0,184,148,.12);color:var(--success);font-weight:700}
+.review-opt.wrong{border-color:var(--danger);background:rgba(225,112,85,.12);color:var(--danger)}
 /* ═══ TIMER ═══ */
 .timer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;font-size:.85rem;color:var(--text2);font-weight:500}
 .timer-bar .time{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -330,8 +334,29 @@ function generateTestQuestions(section){
   return questions;
 }
 
+function fmtTime(sec){
+  const m=Math.floor(sec/60);
+  const r=sec%60;
+  return m+':'+(r<10?'0':'')+r;
+}
+function elapsedSec(){return Math.floor((Date.now()-testState.startTime)/1000)}
+function startTimer(){
+  const s=testState;
+  if(s.timer)clearInterval(s.timer);
+  s.timer=setInterval(()=>{
+    const el=document.getElementById('qTimer');
+    if(el)el.textContent='⏱ '+fmtTime(elapsedSec());
+  },1000);
+  const el0=document.getElementById('qTimer');
+  if(el0)el0.textContent='⏱ 0:00';
+}
+function stopTimer(){
+  const s=testState;
+  if(s.timer){clearInterval(s.timer);s.timer=null;}
+}
 function startTest(section){
   testState={section,questions:generateTestQuestions(section),currentQ:0,answers:{},score:0,startTime:Date.now(),timer:null,timeLeft:0,answered:false,reviewMode:false};
+  startTimer();
   renderQuizQuestion(document.getElementById('content'));
 }
 function calcVocabLevel(score,total){
@@ -589,7 +614,7 @@ function renderQuizQuestion(c){
   let html=`
   <div class="timer-bar">
     <span>${sectionNames[s.section]} — سوال ${s.currentQ+1} از ${s.questions.length}</span>
-    <span class="time">${Math.round(progress)}%</span>
+    <span style="display:flex;gap:10px"><span class="time" id="qTimer">⏱ 0:00</span><span class="time">${Math.round(progress)}%</span></span>
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
   <div class="question-card card">
@@ -640,6 +665,7 @@ function skipQuestion(){
   recalcScore();
   s.currentQ++;
   s.answered=false;
+  startTimer();
   renderQuizQuestion(document.getElementById('content'));
 }
 
@@ -691,13 +717,18 @@ function showReview(){
   s.questions.forEach((q,i)=>{
     const a=s.answers[i];
     const correct=!!(a&&a.correct);
-    const skipped=!(a&&a.answer>=0);
-    let qText='',userAns='',correctAns='',explain='';
+    const skipped=!a||a.skipped===true||a.answer===undefined||a.answer===-1;
+    let qText='',userAns='',correctAns='',explain='',optionsHtml='';
     if(s.section==='vocab'||s.section==='grammar'){
       qText=q.question||q.q||'';
-      correctAns=q.options[q.answer];
-      userAns=skipped?'— رد شده':esc(q.options[a.answer]||'');
       explain=q.explain||'';
+      optionsHtml=q.options.map((opt,i)=>{
+        const isCorrect=i===q.answer;
+        const isUser=!skipped&&a.answer===i;
+        const cls=isCorrect?'review-opt correct':(isUser?'review-opt wrong':'review-opt');
+        const mark=(isCorrect?'✓ ':(isUser?'✗ ':' '))+' ';
+        return '<div class="'+cls+'">'+mark+esc(opt)+(isUser&&!isCorrect?' <span style="opacity:.65;font-size:.72rem">(پاسخ شما)</span>':'')+'</div>';
+      }).join('');
     }else if(s.section==='listening'){
       qText='🎧 '+q.sentence;
       correctAns=q.sentence;
@@ -705,7 +736,7 @@ function showReview(){
     }else if(s.section==='writing'){
       qText=q.prompt;
       userAns=skipped?'— رد شده':(esc(String(a.answer||'').slice(0,140))+(a.answer&&a.answer.length>140?'…':''));
-      explain='امتیاز رایتینگ: '+(a.score!==undefined?a.score:'—')+'/100';
+      explain='امتیاز رایتینگ: '+((a&&a.score!==undefined)?a.score:'—')+'/100';
     }
     rows+='<div class="card" style="margin-bottom:10px;padding:16px">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
@@ -715,6 +746,7 @@ function showReview(){
       '<div style="font-size:.9rem;font-weight:600;direction:ltr;text-align:left;margin-bottom:8px">'+esc(qText)+'</div>'+
       (userAns?'<div style="font-size:.82rem;margin-bottom:4px"><span style="color:var(--text2)">پاسخ شما: </span>'+userAns+'</div>':'')+
       (correctAns?'<div style="font-size:.82rem;margin-bottom:4px"><span style="color:var(--success)">جواب صحیح: </span><strong>'+esc(correctAns)+'</strong></div>':'')+
+      (optionsHtml?'<div style="margin-top:8px">'+optionsHtml+'</div>':'')+
       (explain?'<div class="q-explanation" style="margin-top:8px;font-size:.78rem">'+esc(explain)+'</div>':'')+
     '</div>';
   });
@@ -726,7 +758,7 @@ function showReview(){
       '<div class="stat-grid" style="margin-top:14px">'+
         '<div class="stat-card"><div class="val" style="color:var(--success)">'+s.score+'</div><div class="lbl">صحیح</div></div>'+
         '<div class="stat-card"><div class="val">'+s.questions.length+'</div><div class="lbl">کل سوالات</div></div>'+
-        '<div class="stat-card"><div class="val" style="color:var(--danger)">'+(s.questions.length-s.score)+'</div><div class="lbl">نادرست/ردشده</div></div>'+
+        '<div class="stat-card"><div class="val" style="color:var(--danger)">'+(s.questions.length-s.score)+'</div><div class="lbl">نادرست/ردشده</div></div>'+'<div class="stat-card"><div class="val" style="font-size:1.4rem">'+fmtTime(elapsedSec())+'</div><div class="lbl">⏱ زمان</div></div>'+
       '</div>'+
       '<div class="q-nav" style="margin-top:8px">'+
         '<button class="btn btn-primary" onclick="finishSection()">مشاهده نتیجه نهایی ✓</button>'+
@@ -740,11 +772,11 @@ function showReview(){
 function renderListeningQuestion(c,q,s){
   const progress=Math.round((s.currentQ/s.questions.length)*100);
   const prevAns=s.answers[s.currentQ];
-  const hasAnswer=prevAns&&prevAns.answer!==undefined&&prevAns.answer>=0;
+  const hasAnswer=prevAns&&prevAns.answer!==undefined&&prevAns.answer!==-1&&prevAns.answer!=='';
   let html=`
   <div class="timer-bar">
     <span>لیسنینگ — جمله ${s.currentQ+1} از ${s.questions.length}</span>
-    <span class="time">${Math.round(progress)}%</span>
+    <span style="display:flex;gap:10px"><span class="time" id="qTimer">⏱ 0:00</span><span class="time">${Math.round(progress)}%</span></span>
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
   <div class="question-card card" style="text-align:center">
@@ -805,11 +837,11 @@ function calcSimilarity(a,b){
 function renderWritingQuestion(c,q,s){
   const progress=Math.round((s.currentQ/s.questions.length)*100);
   const prevAns=s.answers[s.currentQ];
-  const hasAnswer=prevAns&&prevAns.answer!==undefined&&prevAns.answer>=0;
+  const hasAnswer=prevAns&&prevAns.answer!==undefined&&prevAns.answer!==-1&&prevAns.answer!=='';
   let html=`
   <div class="timer-bar">
     <span>رایتینگ — موضوع ${s.currentQ+1} از ${s.questions.length}</span>
-    <span class="time">${Math.round(progress)}%</span>
+    <span style="display:flex;gap:10px"><span class="time" id="qTimer">⏱ 0:00</span><span class="time">${Math.round(progress)}%</span></span>
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
   <div class="question-card card">
@@ -843,6 +875,7 @@ function renderWritingQuestion(c,q,s){
 // SECTION COMPLETE
 // ═══════════════════════════════════════════
 function finishSection(){
+  stopTimer();
   const s=testState;
   const total=s.questions.length;
   const pct=Math.round(s.score/total*100);
@@ -874,6 +907,7 @@ function finishSection(){
     <div class="stat-grid">
       <div class="stat-card"><div class="val">${s.score}/${total}</div><div class="lbl">پاسخ صحیح</div></div>
       <div class="stat-card"><div class="val">${pct}%</div><div class="lbl">درصد</div></div>
+      <div class="stat-card"><div class="val" style="font-size:1.5rem">${fmtTime(elapsedSec())}</div><div class="lbl">⏱ زمان</div></div>
     </div>
     <div class="q-nav" style="margin-top:20px">
       <button class="btn btn-primary" onclick="currentTab='home';navHistory=['home'];render()">بازگشت به خانه</button>
