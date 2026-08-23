@@ -162,7 +162,7 @@ const LS_KEY='englishquiz_v1';
 let currentTab='home';
 let S=loadState();
 
-function defaultState(){return{theme:'dark',results:[],currentTest:null,testHistory:[]}}
+function defaultState(){return{theme:'dark',results:[],currentTest:null,testHistory:[],seen:{vocab:[],grammar:[],listening:[],writing:[]}}}
 function loadState(){try{const d=localStorage.getItem(LS_KEY);if(!d)return defaultState();return{...defaultState(),...JSON.parse(d)}}catch(e){return defaultState()}}
 function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}}
 
@@ -178,11 +178,11 @@ function toast(msg,type='info'){const c=document.getElementById('toasts');const 
 // ═══════════════════════════════════════════
 const CEFR_WORDS={
 A1:[{w:'hello',d:'سلام',pos:'interjection'},{w:'good',d:'خوب',pos:'adjective'},{w:'big',d:'بزرگ',pos:'adjective'},{w:'small',d:'کوچک',pos:'adjective'},{w:'house',d:'خانه',pos:'noun'},{w:'water',d:'آب',pos:'noun'},{w:'food',d:'غذا',pos:'noun'},{w:'book',d:'کتاب',pos:'noun'},{w:'friend',d:'دوست',pos:'noun'},{w:'family',d:'خانواده',pos:'noun'},{w:'mother',d:'مادر',pos:'noun'},{w:'father',d:'پدر',pos:'noun'},{w:'child',d:'کودک',pos:'noun'},{w:'dog',d:'سگ',pos:'noun'},{w:'cat',d:'گربه',pos:'noun'},{w:'eat',d:'خوردن',pos:'verb'},{w:'drink',d:'نوشیدن',pos:'verb'},{w:'go',d:'رفتن',pos:'verb'},{w:'come',d:'آمدن',pos:'verb'},{w:'see',d:'دیدن',pos:'verb'},{w:'make',d:'ساختن',pos:'verb'},{w:'give',d:'دادن',pos:'verb'},{w:'take',d:'گرفتن',pos:'verb'},{w:'have',d:'داشتن',pos:'verb'},{w:'be',d:'بودن',pos:'verb'},{w:'one',d:'یک',pos:'number'},{w:'two',d:'دو',pos:'number'},{w:'three',d:'سه',pos:'number'},{w:'red',d:'قرمز',pos:'adjective'},{w:'blue',d:'آبی',pos:'adjective'},{w:'white',d:'سفید',pos:'adjective'},{w:'black',d:'سیاه',pos:'adjective'},{w:'hot',d:'داغ',pos:'adjective'},{w:'cold',d:'سرد',pos:'adjective'},{w:'new',d:'جدید',pos:'adjective'},{w:'old',d:'قدیمی',pos:'adjective'},{w:'happy',d:'خوشحال',pos:'adjective'},{w:'sad',d:'ناراحت',pos:'adjective'},{w:'car',d:'ماشین',pos:'noun'},{w:'school',d:'مدرسه',pos:'noun'}],
-A2:[{w:'animal',d:'حیوان',pos:'noun'},{w:'answer',d:'جواب',pos:'noun'},{w:'believe',d:'باور کردن',pos:'verb'},{w:'careful',d:'محتاط',pos:'adjective'},{w:'dangerous',d:'خطرناک',pos:'adjective'},{w:'different',d:'متفاوت',pos:'adjective'},{w:'enjoy',d:'لذت بردن',pos:'verb'},{w:'example',d:'مثال',pos:'noun'},{w:'expensive',d:'گران',pos:'adjective'},{w:'important',d:'مهم',pos:'adjective'},{w:'interesting',d:'جالب',pos:'adjective'},{w:'machine',d:'ماشین',pos:'noun'},{w:'natural',d:'طبیعی',pos:'adjective'},{w:'necessary',d:'لازم',pos:'adjective'},{w:'polite',d:'مؤدب',pos:'adjective'},{w:'possible',d:'ممکن',pos:'adjective'},{w:'problem',d:'مشکل',pos:'noun'},{w:'question',d:'سوال',pos:'noun'},{w:'quiet',d:'آرام',pos:'adjective'},{w:'remember',d:'به یاد آوردن',pos:'verb'},{w:'simple',d:'ساده',pos:'adjective'},{w:'special',d:'خاص',pos:'adjective'},{w:'strong',d:'قوی',pos:'adjective'},{w:'suddenly',d:'ناگهان',pos:'adverb'},{w:'tired',d:'خسته',pos:'adjective'},{w:'wonderful',d:' fantastic',pos:'adjective'},{w:'young',d:'جوان',pos:'adjective'},{w:'agree',d:'موافقت کردن',pos:'verb'},{w:'arrive',d:'رسیدن',pos:'verb'},{w:'begin',d:'شروع کردن',pos:'verb'}],
+A2:[{w:'animal',d:'حیوان',pos:'noun'},{w:'answer',d:'جواب',pos:'noun'},{w:'believe',d:'باور کردن',pos:'verb'},{w:'careful',d:'محتاط',pos:'adjective'},{w:'dangerous',d:'خطرناک',pos:'adjective'},{w:'different',d:'متفاوت',pos:'adjective'},{w:'enjoy',d:'لذت بردن',pos:'verb'},{w:'example',d:'مثال',pos:'noun'},{w:'expensive',d:'گران',pos:'adjective'},{w:'important',d:'مهم',pos:'adjective'},{w:'interesting',d:'جالب',pos:'adjective'},{w:'machine',d:'ماشین',pos:'noun'},{w:'natural',d:'طبیعی',pos:'adjective'},{w:'necessary',d:'لازم',pos:'adjective'},{w:'polite',d:'مؤدب',pos:'adjective'},{w:'possible',d:'ممکن',pos:'adjective'},{w:'problem',d:'مشکل',pos:'noun'},{w:'question',d:'سوال',pos:'noun'},{w:'quiet',d:'آرام',pos:'adjective'},{w:'remember',d:'به یاد آوردن',pos:'verb'},{w:'simple',d:'ساده',pos:'adjective'},{w:'special',d:'خاص',pos:'adjective'},{w:'strong',d:'قوی',pos:'adjective'},{w:'suddenly',d:'ناگهان',pos:'adverb'},{w:'tired',d:'خسته',pos:'adjective'},{w:'wonderful',d:'فوقالعاده',pos:'adjective'},{w:'young',d:'جوان',pos:'adjective'},{w:'agree',d:'موافقت کردن',pos:'verb'},{w:'arrive',d:'رسیدن',pos:'verb'},{w:'begin',d:'شروع کردن',pos:'verb'}],
 B1:[{w:'achieve',d:'دستیابی',pos:'verb'},{w:'advantage',d:'مزیت',pos:'noun'},{w:'advice',d:'توصیه',pos:'noun'},{w:'appropriate',d:'مناسب',pos:'adjective'},{w:'atmosphere',d:'جو',pos:'noun'},{w:'behavior',d:'رفتار',pos:'noun'},{w:'communicate',d:'ارتباط برقرار کردن',pos:'verb'},{w:'community',d:'اجتماع',pos:'noun'},{w:'compare',d:'مقایسه کردن',pos:'verb'},{w:'complain',d:'شکایت کردن',pos:'verb'},{w:'complex',d:'پیچیده',pos:'adjective'},{w:'concentrate',d:'تمرکز کردن',pos:'verb'},{w:'consequence',d:'نتیجه',pos:'noun'},{w:'consider',d:'در نظر گرفتن',pos:'verb'},{w:'continue',d:'ادامه دادن',pos:'verb'},{w:'contribute',d:'مشارکت کردن',pos:'verb'},{w:'decision',d:'تصمیم',pos:'noun'},{w:'decrease',d:'کاهش',pos:'verb'},{w:'definitely',d:'قطعاً',pos:'adverb'},{w:'develop',d:'توسعه دادن',pos:'verb'},{w:'dictionary',d:'فرهنگ لغت',pos:'noun'},{w:'education',d:'آموزش',pos:'noun'},{w:'electricity',d:'برق',pos:'noun'},{w:'encourage',d:'تشویق کردن',pos:'verb'},{w:'environment',d:'محیط زیست',pos:'noun'},{w:'equipment',d:'تجهیزات',pos:'noun'},{w:'experience',d:'تجربه',pos:'noun'},{w:'expression',d:'عبارت',pos:'noun'},{w:'foreign',d:'خارجی',pos:'adjective'},{w:'frequent',d:'مکرر',pos:'adjective'}],
-B2:[{w:'accomplish',d:'انجام دادن',pos:'verb'},{w:'acquire',d:'به دست آوردن',pos:'verb'},{w:'adequate',d:'کافی',pos:'adjective'},{w:'advocate',d:'حامی',pos:'noun'},{w:'ambitious',d:'جاه‌طلب',pos:'adjective'},{w:'apparent',d:'آشکار',pos:'adjective'},{w:'approach',d:'رویکرد',pos:'noun'},{w:'assessment',d:'ارزیابی',pos:'noun'},{w:'authority',d:'مقام',pos:'noun'},{w:'beneficial',d:'مفید',pos:'adjective'},{w:'capable',d:'توانمند',pos:'adjective'},{w:'circumstance',d:'شرایط',pos:'noun'},{w:'collapse',d:'فروپاشی',pos:'noun'},{w:'commitment',d:'تعهد',pos:'noun'},{w:'comprehensive',d:'جامع',pos:'adjective'},{w:'conclusion',d:'نتیجه‌گیری',pos:'noun'},{w:'confident',d:'مطمئن',pos:'adjective'},{w:'conscious',d:'آگاه',pos:'adjective'},{w:'controversial',d:'بحث‌برانگیز',pos:'adjective'},{w:'contribute',d:'کمک کردن',pos:'verb'},{w:'convince',d:'متقاعد کردن',pos:'verb'},{w:'criticism',d:'انتقاد',pos:'noun'},{w:'definite',d:'مشخص',pos:'adjective'},{w:'deliberate',d:'عمدی',pos:'adjective'},{w:'demonstrate',d:'نشان دادن',pos:'verb'},{w:'dimension',d:'بُعد',pos:'noun'},{w:'distinct',d:'متمایز',pos:'adjective'},{w:'document',d:'سند',pos:'noun'},{w:'domestic',d:'داخلی',pos:'adjective'},{w:'dramatic',d:'دراماتیک',pos:'adjective'}],
-C1:[{w:'ambiguous',d:'ابهام‌آمیز',pos:'adjective'},{w:'articulate',d:'بیانگر',pos:'adjective'},{w:'assertion',d:'ادعا',pos:'noun'},{w:'coherent',d:'منسجم',pos:'adjective'},{w:'compelling',d:'جذاب',pos:'adjective'},{w:'complementary',d:'مکمل',pos:'adjective'},{w:'comply',d:'رعایت کردن',pos:'verb'},{w:'component',d:'جزء',pos:'noun'},{w:'comprise',d:'شامل شدن',pos:'verb'},{w:'conceive',d:'تصور کردن',pos:'verb'},{w:'concurrent',d:'همزمان',pos:'adjective'},{w:'conducive',d:'ساعد',pos:'adjective'},{w:'conflict',d:'تعارض',pos:'noun'},{w:'connotation',d:'بار معنایی',pos:'noun'},{w:'constrain',d:'محدود کردن',pos:'verb'},{w:'contemplate',d:'تأمل کردن',pos:'verb'},{w:'controversial',d:'بحث‌برانگیز',pos:'adjective'},{w:'conventional',d:'سنتی',pos:'adjective'},{w:'correlate',d:'همبستگی داشتن',pos:'verb'},{w:'correspond',d:'مطابقت داشتن',pos:'verb'},{w:'credible',d:'قابل اعتماد',pos:'adjective'},{w:'criterion',d:'معیار',pos:'noun'},{w:'cumulative',d:'تجمعی',pos:'adjective'},{w:'curtail',d:'محدود کردن',pos:'verb'},{w:'deem',d:'لازم دانستن',pos:'verb'},{w:'deteriorate',d:'بدتر شدن',pos:'verb'},{w:'deviate',d:'انحراف داشتن',pos:'verb'},{w:'differentiate',d:'تمایز قائل شدن',pos:'verb'},{w:'discrepancy',d:'تناقض',pos:'noun'},{w:'disseminate',d:'انتشار دادن',pos:'verb'}],
-C2:[{w:'aberration',d:'انحراف',pos:'noun'},{w:'abstruse',d:'پیچیده',pos:'adjective'},{w:'acquiesce',d:'سکوت و رضایت',pos:'verb'},{w:'admonish',d:'توبیخ کردن',pos:'verb'},{w:'aesthetic',d:'زیبایی‌شناختی',pos:'adjective'},{w:'alleviate',d:'تسکین دادن',pos:'verb'},{w:'amalgamate',d:'ادغام کردن',pos:'verb'},{w:'ameliorate',d:'بهبود بخشیدن',pos:'verb'},{w:'anachronism',d:'ناهمزمانی',pos:'noun'},{w:'anomaly',d:'ناهنجاری',pos:'noun'},{w:'antithetical',d:'متناقض',pos:'adjective'},{w:'apocryphal',d:'جادویی',pos:'adjective'},{w:'approbation',d:'تایید',pos:'noun'},{w:'arbitrary',d:'خودسرانه',pos:'adjective'},{w:'arcane',d:'رازآلود',pos:'adjective'},{w:'arduous',d:'دشوار',pos:'adjective'},{w:'ascetic',d:'زاهدانه',pos:'adjective'},{w:'assiduous',d:'پرتلاش',pos:'adjective'},{w:'astute',d:'زیرک',pos:'adjective'},{w:'auspicious',d:'خوش‌یُمن',pos:'adjective'},{w:'bellicose',d:'جنگ‌طلب',pos:'adjective'},{w:'benevolent',d:'خیرخواه',pos:'adjective'},{w:'capitulate',d:'تسلیم شدن',pos:'verb'},{w:'cajole',d:'uther کردن',pos:'verb'},{w:'candor',d:'صراحت',pos:'noun'},{w:'capricious',d:'لجباز',pos:'adjective'},{w:'circumlocution',d:'دور زدن',pos:'noun'},{w:'clandestine',d:'پنهانی',pos:'adjective'},{w:'coalesce',d:'ادغام شدن',pos:'verb'},{w:'commensurate',d:'متناسب',pos:'adjective'}]
+B2:[{w:'accomplish',d:'انجام دادن',pos:'verb'},{w:'acquire',d:'به دست آوردن',pos:'verb'},{w:'adequate',d:'کافی',pos:'adjective'},{w:'advocate',d:'حامی',pos:'noun'},{w:'ambitious',d:'جاه‌طلب',pos:'adjective'},{w:'apparent',d:'آشکار',pos:'adjective'},{w:'approach',d:'رویکرد',pos:'noun'},{w:'assessment',d:'ارزیابی',pos:'noun'},{w:'authority',d:'مقام',pos:'noun'},{w:'beneficial',d:'مفید',pos:'adjective'},{w:'capable',d:'توانمند',pos:'adjective'},{w:'circumstance',d:'شرایط',pos:'noun'},{w:'collapse',d:'فروپاشی',pos:'noun'},{w:'commitment',d:'تعهد',pos:'noun'},{w:'comprehensive',d:'جامع',pos:'adjective'},{w:'conclusion',d:'نتیجه‌گیری',pos:'noun'},{w:'confident',d:'مطمئن',pos:'adjective'},{w:'conscious',d:'آگاه',pos:'adjective'},{w:'controversial',d:'بحث‌برانگیز',pos:'adjective'},{w:'facilitate',d:'تسهیل کردن',pos:'verb'},{w:'convince',d:'متقاعد کردن',pos:'verb'},{w:'criticism',d:'انتقاد',pos:'noun'},{w:'definite',d:'مشخص',pos:'adjective'},{w:'deliberate',d:'عمدی',pos:'adjective'},{w:'demonstrate',d:'نشان دادن',pos:'verb'},{w:'dimension',d:'بُعد',pos:'noun'},{w:'distinct',d:'متمایز',pos:'adjective'},{w:'document',d:'سند',pos:'noun'},{w:'domestic',d:'داخلی',pos:'adjective'},{w:'dramatic',d:'دراماتیک',pos:'adjective'}],
+C1:[{w:'ambiguous',d:'ابهام‌آمیز',pos:'adjective'},{w:'articulate',d:'خوشبیان',pos:'adjective'},{w:'assertion',d:'ادعا',pos:'noun'},{w:'coherent',d:'منسجم',pos:'adjective'},{w:'compelling',d:'جذاب',pos:'adjective'},{w:'complementary',d:'مکمل',pos:'adjective'},{w:'comply',d:'رعایت کردن',pos:'verb'},{w:'component',d:'جزء',pos:'noun'},{w:'comprise',d:'شامل شدن',pos:'verb'},{w:'conceive',d:'تصور کردن',pos:'verb'},{w:'concurrent',d:'همزمان',pos:'adjective'},{w:'conducive',d:'مساعد',pos:'adjective'},{w:'conflict',d:'تعارض',pos:'noun'},{w:'connotation',d:'بار معنایی',pos:'noun'},{w:'constrain',d:'محدود کردن',pos:'verb'},{w:'contemplate',d:'تأمل کردن',pos:'verb'},{w:'hinder',d:'مانع شدن',pos:'verb'},{w:'conventional',d:'سنتی',pos:'adjective'},{w:'correlate',d:'همبستگی داشتن',pos:'verb'},{w:'correspond',d:'مطابقت داشتن',pos:'verb'},{w:'credible',d:'قابل اعتماد',pos:'adjective'},{w:'criterion',d:'معیار',pos:'noun'},{w:'cumulative',d:'تجمعی',pos:'adjective'},{w:'curtail',d:'محدود کردن',pos:'verb'},{w:'deem',d:'انگاشتن، تلقی کردن',pos:'verb'},{w:'deteriorate',d:'بدتر شدن',pos:'verb'},{w:'deviate',d:'انحراف داشتن',pos:'verb'},{w:'differentiate',d:'تمایز قائل شدن',pos:'verb'},{w:'discrepancy',d:'تناقض',pos:'noun'},{w:'disseminate',d:'انتشار دادن',pos:'verb'}],
+C2:[{w:'aberration',d:'انحراف',pos:'noun'},{w:'abstruse',d:'پیچیده',pos:'adjective'},{w:'acquiesce',d:'بدون اعتراض پذیرفتن',pos:'verb'},{w:'admonish',d:'توبیخ کردن',pos:'verb'},{w:'aesthetic',d:'زیبایی‌شناختی',pos:'adjective'},{w:'alleviate',d:'تسکین دادن',pos:'verb'},{w:'amalgamate',d:'ادغام کردن',pos:'verb'},{w:'ameliorate',d:'بهبود بخشیدن',pos:'verb'},{w:'anachronism',d:'ناهمزمانی',pos:'noun'},{w:'anomaly',d:'ناهنجاری',pos:'noun'},{w:'antithetical',d:'متناقض',pos:'adjective'},{w:'apocryphal',d:'جعلی، ساختگی',pos:'adjective'},{w:'approbation',d:'تایید',pos:'noun'},{w:'arbitrary',d:'خودسرانه',pos:'adjective'},{w:'arcane',d:'رازآلود',pos:'adjective'},{w:'arduous',d:'دشوار',pos:'adjective'},{w:'ascetic',d:'زاهدانه',pos:'adjective'},{w:'assiduous',d:'پرتلاش',pos:'adjective'},{w:'astute',d:'زیرک',pos:'adjective'},{w:'auspicious',d:'خوش‌یُمن',pos:'adjective'},{w:'bellicose',d:'جنگ‌طلب',pos:'adjective'},{w:'benevolent',d:'خیرخواه',pos:'adjective'},{w:'capitulate',d:'تسلیم شدن',pos:'verb'},{w:'cajole',d:'با چاپلوسی راضی کردن',pos:'verb'},{w:'candor',d:'صراحت',pos:'noun'},{w:'capricious',d:'لجباز',pos:'adjective'},{w:'circumlocution',d:'دور زدن',pos:'noun'},{w:'clandestine',d:'پنهانی',pos:'adjective'},{w:'coalesce',d:'ادغام شدن',pos:'verb'},{w:'commensurate',d:'متناسب',pos:'adjective'}]
 };
 
 // Grammar questions by level
@@ -197,7 +197,9 @@ A1:[
 {q:'We ___ at 7 o\'clock.',options:['get up','gets up','getting up','got up'],answer:0,explain:'With "we" use base form'},
 {q:'This is ___ apple.',options:['a','an','the','one'],answer:1,explain:'Use "an" before vowel sounds'},
 {q:'She can ___ very fast.',options:['runs','running','run','ran'],answer:2,explain:'After modal verbs use base form'},
-{q:'There ___ many people here.',options:['is','are','has','have'],answer:1,explain:'With plural nouns use "are"'}
+{q:'There ___ many people here.',options:['is','are','has','have'],answer:1,explain:'With plural nouns use "are"'},
+{q:'My sister ___ to music every morning.',options:['listen','listens','listening','listened'],answer:1,explain:'Third person singular adds -s: listens'},
+{q:'There ___ a book on the desk.',options:['is','are','am','be'],answer:0,explain:'Singular subject: there is'}
 ],
 A2:[
 {q:'I have been living here ___ 2019.',options:['for','since','from','in'],answer:1,explain:'Use "since" with a specific point in time'},
@@ -209,7 +211,9 @@ A2:[
 {q:'She has already ___ her homework.',options:['finish','finishes','finished','finishing'],answer:2,explain:'Present perfect: has/have + past participle'},
 {q:'___ going to rain tomorrow.',options:['It\'s','Its','It','There'],answer:0,explain:'"It\'s" = "It is" for predictions'},
 {q:'This is the book ___ I told you about.',options:['who','which','where','when'],answer:1,explain:'Use "which" for things'},
-{q:'He speaks English ___ fluently.',options:['very','much','more','most'],answer:0,explain:'Use "very" before adverbs'}
+{q:'He speaks English ___ fluently.',options:['very','much','more','most'],answer:0,explain:'Use "very" before adverbs'},
+{q:'We ___ to the cinema last night.',options:['go','went','gone','going'],answer:1,explain:'Past simple of "go" is "went"'},
+{q:'This is the house ___ I grew up.',options:['where','which','who','whose'],answer:0,explain:'Use "where" for places'}
 ],
 B1:[
 {q:'By the time I arrived, they ___.',options:['left','have left','had left','were leaving'],answer:2,explain:'Past perfect: had + past participle for earlier action'},
@@ -221,7 +225,9 @@ B1:[
 {q:'I wish I ___ more time to travel.',options:['have','had','has','having'],answer:1,explain:'Wish + past tense for present regrets'},
 {q:'She is used to ___ early.',options:['wake','waking','wakes','woken'],answer:1,explain:'"Used to" + gerund (-ing)'},
 {q:'Not until I saw the evidence ___ convinced.',options:['I was','was I','I am','am I'],answer:1,explain:'Negative inversion after "Not until"'},
-{q:'The more you practice, ___ you become.',options:['good','better','the better','the good'],answer:2,explain:'The + comparative, the + comparative'}
+{q:'The more you practice, ___ you become.',options:['good','better','the better','the good'],answer:2,explain:'The + comparative, the + comparative'},
+{q:'If I ___ you, I would apologize.',options:['was','were','am','be'],answer:1,explain:'Second conditional: "If I were you" (subjunctive)'},
+{q:'She asked whether I ___ the report yet.',options:['finished','had finished','finish','finishing'],answer:1,explain:'Past perfect for an action completed before the reported time'}
 ],
 B2:[
 {q:'Had the government acted sooner, the crisis ___ prevented.',options:['could have been','could be','could had been','can be'],answer:0,explain:'Past unreal conditional with modal: could have been + past participle'},
@@ -233,19 +239,23 @@ B2:[
 {q:'___ the circumstances, we have no alternative but to postpone.',options:['Under','In','On','At'],answer:0,explain:'"Under the circumstances" is the fixed expression'},
 {q:'The findings are ___ with the previous research.',options:['consistent','consistence','consisting','consistently'],answer:0,explain:'"Consistent with" — adjective needed after "are"'},
 {q:'___ sufficient evidence, the case was dismissed.',options:['There being','Being','Having','It being'],answer:0,explain:'Absolute participial phrase: There being + noun'},
-{q:'So absorbed ___ in her book that she didn\'t hear the doorbell.',options:['she was','was she','is she','she is'],answer:1,explain:'So + adjective + inversion for emphasis'}
+{q:'So absorbed ___ in her book that she didn\'t hear the doorbell.',options:['she was','was she','is she','she is'],answer:1,explain:'So + adjective + inversion for emphasis'},
+{q:'The manager insisted that the report ___ submitted by noon.',options:['be','is','was','being'],answer:0,explain:'Subjunctive after "insisted that": base form'},
+{q:'___ her busy schedule, she still found time to help.',options:['Despite','Although','However','Because'],answer:0,explain:'"Despite" + noun phrase (not a clause)'}
 ],
 C1:[
-{q:'___ it not been for your intervention, the project would have failed.',options:['Were','Had','Has','If'],answer:1,explain:'Inverted third conditional: Had + subject + past participle'},
+{q:'Rarely ___ such dedication from an intern.',options:['have we seen','we have seen','we seen','have seen we'],answer:0,explain:'"Rarely" at the start requires subject-auxiliary inversion'},
 {q:'The CEO, ___ along with several executives, resigned yesterday.',options:['who','whom','whose','which'],answer:0,explain:'Non-restrictive clause with subject relative pronoun'},
 {q:'The proposal was rejected, ___ was anticipated by many.',options:['which','as','what','that'],answer:1,explain:'"As" for expected/anticipated events'},
 {q:'Scarcely ___ the meeting when the fire alarm went off.',options:['had we started','we had started','did we start','we started'],answer:0,explain:'Scarcely + had + subject + past participle'},
-{q:'The data suggests that the trend ___ continue.',options:['will','would','should','might'],answer:0,explain:'With "suggests" we can use any modal based on certainty level'},
-{q:'___ the fact that the evidence was compelling, the jury acquitted him.',options:['Despite','Notwithstanding','Although','However'],answer:1,explain:'Notwithstanding = in spite of (formal)'},
+{q:'Had I known about the delay, I ___ earlier.',options:['would have left','would leave','will leave','had left'],answer:0,explain:'Third conditional: had + past participle → would have + past participle'},
+{q:'Little ___ that the decision would backfire.',options:['did they know','they knew','they did know','knew they'],answer:0,explain:'Negative adverbial "Little" at the start requires subject-auxiliary inversion'},
 {q:'She is the kind of person ___ everyone looks up to.',options:['who','whom','that','which'],answer:0,explain:'Informal English allows "who" as object'},
 {q:'The committee\'s decision, while controversial, is ___ defensible.',options:['entirely','whole','wholly','complete'],answer:0,explain:'Adverb modifying adjective "defensible"'},
 {q:'No sooner ___ the news than celebrations erupted.',options:['they heard','did they hear','they did hear','hear they'],answer:1,explain:'No sooner + had/did + subject + past participle'},
-{q:'The theory ___ forward by the professor has been widely debated.',options:['put','was put','putting','having put'],answer:0,explain:'Reduced passive: put forward (past participle as adjective)'}
+{q:'The theory ___ forward by the professor has been widely debated.',options:['put','was put','putting','having put'],answer:0,explain:'Reduced passive: put forward (past participle as adjective)'},
+{q:'Under no circumstances ___ the confidential files.',options:['should you share','you should share','you share','share you'],answer:0,explain:'Negative adverbial "Under no circumstances" requires inversion'},
+{q:'By the end of the decade, the population ___ significantly.',options:['will have grown','will grow','grows','grew'],answer:0,explain:'Future perfect: completed action by a future time'}
 ],
 C2:[
 {q:'___ it not been for his profligacy, the family fortune would have endured.',options:['Were','Had','If','Should'],answer:1,explain:'Formal inversion: Had + subject + past participle (third conditional)'},
@@ -256,29 +266,31 @@ C2:[
 {q:'So-called experts, ___ should know better, are perpetuating this myth.',options:['who','whom','whose','which'],answer:0,explain:'Non-restrictive clause with subject pronoun'},
 {q:'The policy, ___ designed to alleviate poverty, has instead exacerbated it.',options:['ostensibly','ostensible','ostentatious','ostentation'],answer:0,explain:'Adverb modifying the past participle "designed"'},
 {q:'That the hypothesis will be ___ by subsequent research remains doubtful.',options:['borne out','born out','borne of','born of'],answer:0,explain:'"Borne out" = confirmed/proven (passive of "bear out")'},
-{q:'The concept, ___ it may seem paradoxical, is fundamentally sound.',options:['while','whereas','although','however'],answer:0,explain:'"While it may seem" — concessive clause with present subjunctive'},
-{q:'___ the exigencies of the situation, the board opted for pragmatism over principle.',options:['Given','Provided','Supposing','Assuming'],answer:0,explain:'"Given" = considering (formal preposition)'}
+{q:'Only after the results were published ___ the controversy begin.',options:['did','was','had','would'],answer:0,explain:'"Only after" at the start requires subject-auxiliary inversion (did + base form)'},
+{q:'___ the exigencies of the situation, the board opted for pragmatism over principle.',options:['Given','Provided','Supposing','Assuming'],answer:0,explain:'"Given" = considering (formal preposition)'},
+{q:'So intricate ___ the machinery that only specialists could operate it.',options:['was','were','is','being'],answer:0,explain:'"So + adjective" at the start requires inversion: was the machinery'},
+{q:'Not until the audit was completed ___ the discrepancies surface.',options:['did','had','would','does'],answer:0,explain:'"Not until" + clause at the start requires inversion with did'}
 ]
 };
 
 // Listening sentences by level
 const LISTENING_SENTENCES={
-A1:['The cat is on the table.','I like to eat pizza.','She is my friend.','The book is red.','We go to school.'],
-A2:['The weather is very cold today.','I have been waiting for two hours.','She decided to take a different route.','The children are playing in the garden.','He asked me a very interesting question.'],
-B1:['Despite the heavy traffic, we managed to arrive on time.','The government has announced new environmental policies.','She has been working on this project since last March.','The conference will be held in the main auditorium.','They would have succeeded if they had tried harder.'],
-B2:['The implications of this research are far-reaching and significant.','Notwithstanding the economic downturn, the company posted record profits.','The committee\'s recommendations will be implemented forthwith.','The phenomenon has been extensively documented in the literature.','Her articulate presentation belied her nervousness.'],
-C1:['The corollary of increased productivity is often reduced workforce satisfaction.','Not only did the experiment fail to substantiate the hypothesis, but it also raised additional questions.','The juxtaposition of traditional and modern elements creates a compelling aesthetic.','The peripheral effects of climate change are increasingly manifest in urban ecosystems.','The preponderance of evidence suggests a causal relationship between the variables.'],
-C2:['The inscrutability of quantum mechanics has perplexed even the most erudite physicists.','The sesquipedalian professor\'s lectures were both illuminating and bewildering.','The inexorable march of technological progress renders certain skills ephemeral.','The dichotomy between theoretical elegance and empirical validation remains unresolved.','The parsimonious interpretation of these data proves more tenable than alternative hypotheses.']
+A1:['The cat is on the table.','I like to eat pizza.','She is my friend.','The book is red.','We go to school.','I have a red car.','The dog is sleeping.'],
+A2:['The weather is very cold today.','I have been waiting for two hours.','She decided to take a different route.','The children are playing in the garden.','He asked me a very interesting question.','She bought some bread at the market.','We usually eat dinner at eight.'],
+B1:['Despite the heavy traffic, we managed to arrive on time.','The government has announced new environmental policies.','She has been working on this project since last March.','The conference will be held in the main auditorium.','They would have succeeded if they had tried harder.','The new regulations will come into effect next month.','Although it was late, he kept working.'],
+B2:['The implications of this research are far-reaching and significant.','Notwithstanding the economic downturn, the company posted record profits.','The committee\'s recommendations will be implemented forthwith.','The phenomenon has been extensively documented in the literature.','Her articulate presentation belied her nervousness.','The proposal was met with considerable skepticism by the board.','Having reviewed the data, she revised her conclusion.'],
+C1:['The corollary of increased productivity is often reduced workforce satisfaction.','Not only did the experiment fail to substantiate the hypothesis, but it also raised additional questions.','The juxtaposition of traditional and modern elements creates a compelling aesthetic.','The peripheral effects of climate change are increasingly manifest in urban ecosystems.','The preponderance of evidence suggests a causal relationship between the variables.','The cessation of hostilities brought a tentative peace to the region.','His eloquent defense of the policy swayed several undecided members.'],
+C2:['The inscrutability of quantum mechanics has perplexed even the most erudite physicists.','The sesquipedalian professor\'s lectures were both illuminating and bewildering.','The inexorable march of technological progress renders certain skills ephemeral.','The dichotomy between theoretical elegance and empirical validation remains unresolved.','The parsimonious interpretation of these data proves more tenable than alternative hypotheses.','The specious reasoning in the argument was quickly exposed by the critics.','Her magnanimous gesture, though unexpected, was widely applauded.']
 };
 
 // Writing prompts by level
 const WRITING_PROMPTS={
-A1:['Write a sentence about your family.','Write about what you eat for breakfast.','Write about your best friend.'],
-A2:['Write about your favorite holiday. (2-3 sentences)','Write about what you did last weekend. (2-3 sentences)','Describe your school or workplace. (2-3 sentences)'],
-B1:['Write about the advantages and disadvantages of social media. (4-5 sentences)','Describe a memorable experience from your childhood. (4-5 sentences)','Write about an important goal you have for the future. (4-5 sentences)'],
-B2:['Write a brief argument for or against mandatory volunteering. (5-6 sentences)','Discuss how technology has changed education. (5-6 sentences)','Write about the challenges of living in a globalized world. (5-6 sentences)'],
-C1:['Write a critical analysis of a current social issue. (6-8 sentences)','Discuss the ethical implications of artificial intelligence. (6-8 sentences)','Write about the relationship between language and cultural identity. (6-8 sentences)'],
-C2:['Write an essay arguing for or against the concept of universal basic income. (8-10 sentences)','Discuss the paradox of freedom and responsibility in modern democracies. (8-10 sentences)','Analyze the role of dissent in driving scientific progress. (8-10 sentences)']
+A1:['Write a sentence about your family.','Write about what you eat for breakfast.','Write about your best friend.','Write a sentence about the weather today.'],
+A2:['Write about your favorite holiday. (2-3 sentences)','Write about what you did last weekend. (2-3 sentences)','Describe your school or workplace. (2-3 sentences)','Describe a typical day in your life. (2-3 sentences)'],
+B1:['Write about the advantages and disadvantages of social media. (4-5 sentences)','Describe a memorable experience from your childhood. (4-5 sentences)','Write about an important goal you have for the future. (4-5 sentences)','Write about a film or book that influenced you. (4-5 sentences)'],
+B2:['Write a brief argument for or against mandatory volunteering. (5-6 sentences)','Discuss how technology has changed education. (5-6 sentences)','Write about the challenges of living in a globalized world. (5-6 sentences)','Discuss the role of social media in modern democracy. (5-6 sentences)'],
+C1:['Write a critical analysis of a current social issue. (6-8 sentences)','Discuss the ethical implications of artificial intelligence. (6-8 sentences)','Write about the relationship between language and cultural identity. (6-8 sentences)','Analyze the impact of remote work on urban development. (6-8 sentences)'],
+C2:['Write an essay arguing for or against the concept of universal basic income. (8-10 sentences)','Discuss the paradox of freedom and responsibility in modern democracies. (8-10 sentences)','Analyze the role of dissent in driving scientific progress. (8-10 sentences)','Critique the argument that economic growth inevitably leads to environmental degradation. (8-10 sentences)']
 };
 
 // ═══════════════════════════════════════════
@@ -288,50 +300,62 @@ let testState={section:null,questions:[],currentQ:0,answers:[],score:0,startTime
 let results={vocab:0,grammar:0,listening:0,writing:0,level:'',totalScore:0};
 
 function generateTestQuestions(section){
-  const questions=[];
+  const L=['A1','A2','B1','B2','C1','C2'];
+  const seen=(S.seen&&S.seen[section])?new Set(S.seen[section]):new Set();
+  const pick=(pool,keyFn,count)=>{
+    const fresh=pool.filter(x=>!seen.has(keyFn(x)));
+    const src=fresh.length>=count?fresh:pool;
+    return shuffle(src).slice(0,count);
+  };
+  const picked=[];
   if(section==='vocab'){
-    // 8 questions per level, mixed
-    const levels=Object.keys(CEFR_WORDS);
-    levels.forEach(level=>{
-      const words=shuffle(CEFR_WORDS[level]).slice(0,4);
-      words.forEach(w=>{
-        // Get wrong answers from other levels
-        const otherLevels=levels.filter(l=>l!==level);
-        const wrongWords=[];
+    L.forEach(level=>{
+      pick(CEFR_WORDS[level]||[],w=>w.w,6).forEach(w=>{
+        const otherLevels=L.filter(l=>l!==level);
+        const distractors=[];
         otherLevels.forEach(ol=>{
-          const rnd=shuffle(CEFR_WORDS[ol]).slice(0,2);
-          wrongWords.push(...rnd);
+          (CEFR_WORDS[ol]||[]).forEach(x=>{if(x.d!==w.d)distractors.push(x.d)});
         });
-        const wrongOptions=shuffle(wrongWords).slice(0,3).map(x=>x.d);
+        const wrongOptions=shuffle([...new Set(distractors)]).slice(0,3);
         if(wrongOptions.length<3)return;
         const options=shuffle([w.d,...wrongOptions]);
-        questions.push({level,word:w.w,pos:w.pos,question:'معنی کلمه "'+w.w+'" چیست؟',options,answer:options.indexOf(w.d),explain:w.w+' یعنی '+w.d+' ('+w.pos+')'});
+        picked.push({level,word:w.w,pos:w.pos,question:'معنی کلمه "'+w.w+'" چیست؟',options,answer:options.indexOf(w.d),explain:w.w+' یعنی '+w.d+' ('+w.pos+')'});
       });
     });
-    return shuffle(questions).slice(0,30);
-  }
-  if(section==='grammar'){
-    const all=[];
-    Object.keys(GRAMMAR_QUESTIONS).forEach(level=>{
-      GRAMMAR_QUESTIONS[level].forEach(q=>all.push({...q,level}));
+  }else if(section==='grammar'){
+    L.forEach(level=>{
+      pick(GRAMMAR_QUESTIONS[level]||[],q=>q.q,5).forEach(q=>picked.push({...q,level}));
     });
-    return shuffle(all).slice(0,25);
-  }
-  if(section==='listening'){
-    const all=[];
-    Object.keys(LISTENING_SENTENCES).forEach(level=>{
-      LISTENING_SENTENCES[level].forEach(s=>all.push({sentence:s,level}));
+  }else if(section==='listening'){
+    L.forEach((level,i)=>{
+      const count=i<4?4:2;
+      pick(LISTENING_SENTENCES[level]||[],s=>s,count).forEach(s=>picked.push({sentence:s,level}));
     });
-    return shuffle(all).slice(0,15);
-  }
-  if(section==='writing'){
-    const all=[];
-    Object.keys(WRITING_PROMPTS).forEach(level=>{
-      WRITING_PROMPTS[level].forEach(p=>all.push({prompt:p,level}));
+  }else if(section==='writing'){
+    L.forEach(level=>{
+      pick(WRITING_PROMPTS[level]||[],p=>p,1).forEach(p=>picked.push({prompt:p,level}));
     });
-    return shuffle(all).slice(0,5);
   }
-  return questions;
+  return rampOrder(picked);
+}
+function rampOrder(questions){
+  const L=['A1','A2','B1','B2','C1','C2'];
+  return questions
+    .map(q=>({q,key:L.indexOf(q.level)+(Math.random()*0.7-0.35)}))
+    .sort((a,b)=>a.key-b.key)
+    .map(x=>x.q);
+}
+function markSeen(){
+  const s=testState;
+  if(!s||!s.section)return;
+  const keyOf={vocab:q=>q.word,grammar:q=>q.q,listening:q=>q.sentence,writing:q=>q.prompt};
+  const f=keyOf[s.section];
+  if(!S.seen)S.seen={};
+  if(!S.seen[s.section])S.seen[s.section]=[];
+  const set=new Set(S.seen[s.section]);
+  s.questions.forEach(q=>{const k=f(q);if(k)set.add(k);});
+  S.seen[s.section]=[...set].slice(-500);
+  save();
 }
 
 function fmtTime(sec){
@@ -524,25 +548,25 @@ function renderHome(c){
       <div class="sec-icon" style="background:rgba(108,92,231,.15)">📖</div>
       <div class="sec-info">
         <div class="sec-title">واژگان (Vocabulary)</div>
-        <div class="sec-desc">۳۰ سوال چندگزینه‌ای — سطح A1 تا C2</div>
+        <div class="sec-desc">۳۶ سوال چندگزینه‌ای — سطح A1 تا C2</div>
       </div>
-      <div class="sec-status"><span class="badge badge-accent">۳۰ سوال</span></div>
+      <div class="sec-status"><span class="badge badge-accent">۳۶ سوال</span></div>
     </button>
     <button class="quiz-section-btn" onclick="navigateTo('grammar')">
       <div class="sec-icon" style="background:rgba(0,184,148,.15)">✏️</div>
       <div class="sec-info">
         <div class="sec-title">گرامر (Grammar)</div>
-        <div class="sec-desc">۲۵ سوال جای خالی و انتخاب صحیح</div>
+        <div class="sec-desc">۳۰ سوال جای خالی و انتخاب صحیح</div>
       </div>
-      <div class="sec-status"><span class="badge badge-success">۲۵ سوال</span></div>
+      <div class="sec-status"><span class="badge badge-success">۳۰ سوال</span></div>
     </button>
     <button class="quiz-section-btn" onclick="navigateTo('listening')">
       <div class="sec-icon" style="background:rgba(253,203,110,.15)">🎧</div>
       <div class="sec-info">
         <div class="sec-title">لیسنینگ (Listening)</div>
-        <div class="sec-desc">۱۵ جمله — گوش بده و تایپ کن</div>
+        <div class="sec-desc">۲۰ جمله — گوش بده و تایپ کن</div>
       </div>
-      <div class="sec-status"><span class="badge badge-warning">۱۵ جمله</span></div>
+      <div class="sec-status"><span class="badge badge-warning">۲۰ جمله</span></div>
     </button>
     <button class="quiz-section-btn" onclick="navigateTo('writing')">
       <div class="sec-icon" style="background:rgba(225,112,85,.15)">📝</div>
@@ -550,7 +574,7 @@ function renderHome(c){
         <div class="sec-title">رایتینگ (Writing)</div>
         <div class="sec-desc">۵ موضوع نویسندگی با بررسی خودکار</div>
       </div>
-      <div class="sec-status"><span class="badge badge-danger">۵ موضوع</span></div>
+      <div class="sec-status"><span class="badge badge-danger">۶ موضوع</span></div>
     </button>
   </div>
 
@@ -687,6 +711,7 @@ function goToFirstUnanswered(){
 }
 
 function finishTest(){
+  markSeen();
   const s=testState;
   const c=document.getElementById('content');
   const unanswered=[];
@@ -876,6 +901,7 @@ function renderWritingQuestion(c,q,s){
 // ═══════════════════════════════════════════
 function finishSection(){
   stopTimer();
+  markSeen();
   const s=testState;
   const total=s.questions.length;
   const pct=Math.round(s.score/total*100);
@@ -1150,15 +1176,15 @@ function renderAbout(c){
       <div style="display:grid;gap:8px;margin-top:16px">
         <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--accent)">
           <strong>📖 واژگان</strong>
-          <p style="color:var(--text2);font-size:.8rem">۳۰ سوال از سطح A1 تا C2</p>
+          <p style="color:var(--text2);font-size:.8rem">۳۶ سوال از سطح A1 تا C2</p>
         </div>
         <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--success)">
           <strong>✏️ گرامر</strong>
-          <p style="color:var(--text2);font-size:.8rem">۲۵ سوال دستور زبان</p>
+          <p style="color:var(--text2);font-size:.8rem">۳۰ سوال دستور زبان</p>
         </div>
         <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--warning)">
           <strong>🎧 لیسنینگ</strong>
-          <p style="color:var(--text2);font-size:.8rem">۱۵ جمله شنیداری با تبدیل متن به صدا</p>
+          <p style="color:var(--text2);font-size:.8rem">۲۰ جمله شنیداری با تبدیل متن به صدا</p>
         </div>
         <div style="padding:10px 14px;background:var(--bg);border-radius:8px;border-right:3px solid var(--danger)">
           <strong>📝 رایتینگ</strong>
