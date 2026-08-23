@@ -134,6 +134,16 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .bottom-nav-tab.active{color:var(--accent);background:var(--accent-glow)}
 .bottom-nav-tab:hover{color:var(--accent)}
 @media(min-width:768px){.bottom-nav-tab{min-width:80px;font-size:.75rem;padding:8px 20px}}
+#printArea{display:none}
+@media print{
+  body{background:#fff!important}
+  #app{display:none!important}
+  #printArea{display:block!important}
+  #printArea .bg-green{background:#dcfce7;border-radius:4px;padding:3px 6px;margin:2px 0;color:#166534}
+  #printArea .bg-red{background:#fee2e2;border-radius:4px;padding:3px 6px;margin:2px 0;color:#991b1b}
+  #printArea .bg-gray{background:#f3f4f6;border-radius:4px;padding:3px 6px;margin:2px 0;color:#374151}
+  #printArea .badge-skip{background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-size:.68rem}
+}
 </style>
 </head>
 <body>
@@ -1070,6 +1080,7 @@ function finishSection(){
     <div class="q-nav" style="margin-top:20px">
       <button class="btn btn-primary" onclick="showReview()">📋 مشاهده جواب‌ها</button>
       <button class="btn btn-ghost" onclick="navigateTo('results')">مشاهده نتایج</button>
+      <button class="btn btn-primary" onclick="printReport()">🖨 خروجی PDF</button>
       <button class="btn btn-ghost" onclick="currentTab='home';navHistory=['home'];render()">بازگشت به خانه</button>
     </div>
   </div>`;
@@ -1151,6 +1162,92 @@ function nextSection(sec){
 // ═══════════════════════════════════════════
 // RESULTS
 // ═══════════════════════════════════════════
+function printReport(){
+  const history=S.results.slice(-50);
+  const historyReversed=[...history].reverse();
+  const latest={};
+  historyReversed.forEach(r=>{if(!latest[r.section])latest[r.section]=r});
+  const sectionNames={vocab:'واژگان',grammar:'گرامر',listening:'لیسنینگ',writing:'رایتینگ'};
+  const sectionIcons={vocab:'📖',grammar:'✏️',listening:'🎧',writing:'📝'};
+  const sectionColors={vocab:'#6c5ce7',grammar:'#00b894',listening:'#fdcb6e',writing:'#e17055'};
+  const scores=Object.values(latest).map(r=>r.pct);
+  const avgScore=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;
+  let overallLevel='A1';
+  if(avgScore>=90)overallLevel='C2';else if(avgScore>=80)overallLevel='C1';else if(avgScore>=65)overallLevel='B2';else if(avgScore>=50)overallLevel='B1';else if(avgScore>=35)overallLevel='A2';
+  const levelDescs={A1:'مبتدی — Basic',A2:'ابتدایی — Elementary',B1:'متوسط — Intermediate',B2:'فوق متوسط — Upper-Intermediate',C1:'پیشرفته — Advanced',C2:'ماهر — Proficient'};
+  const levelTips={A1:'تمرین روزانه واژگان پایه و جملات ساده.',A2:'کتاب‌های ساده انگلیسی بخوانید.',B1:'پادکست انگلیسی گوش دهید.',B2:'کتاب‌های داستانی بخوانید.',C1:'مقالات علمی بخوانید.',C2:'متون ادبی و علمی پیچیده بخوانید.'};
+  const sectionScores=Object.keys(latest).map(s=>({section:s,pct:latest[s].pct}));
+  sectionScores.sort((a,b)=>a.pct-b.pct);
+  const weakest=sectionScores[0];
+  const strongest=sectionScores[sectionScores.length-1];
+  let reviewHtml='';
+  const ts=testState;
+  if(ts&&ts.questions&&ts.questions.length){
+    ts.questions.forEach((q,i)=>{
+      const a=ts.answers[i];
+      const skipped=!a||a.skipped===true||a.answer===undefined||a.answer===-1;
+      let body='';
+      if(ts.section==='vocab'||ts.section==='grammar'){
+        body=esc(q.question||q.q||'');
+        if(q.options&&q.options.length){
+          body+='<div style="margin-top:6px">'+q.options.map((opt,oi)=>{
+            const isC=oi===q.answer;
+            const isU=!skipped&&a.answer===oi;
+            const cls=isC?'bg-green':(isU?'bg-red':'bg-gray');
+            return '<div class="'+cls+'">'+(isC?'✓ ':(isU?'✗ ':'• '))+esc(opt)+(isU&&!isC?' (پاسخ شما)':'')+'</div>';
+          }).join('')+'</div>';
+        }
+        if(q.explain)body+='<div style="font-size:.75rem;color:#555;margin-top:4px">💡 '+esc(q.explain)+'</div>';
+      }else if(ts.section==='listening'){
+        body='🎧 '+esc(q.sentence||'');
+        body+='<div style="margin-top:4px">پاسخ شما: '+(skipped?'— رد شده':esc(String(a.answer||'')))+'</div>';
+        body+='<div style="color:#16a34a">جواب صحیح: '+esc(q.sentence||'')+'</div>';
+      }else if(ts.section==='writing'){
+        body=esc(q.prompt||'');
+        body+='<div style="margin-top:4px">پاسخ شما: '+(skipped?'— رد شده':esc(String(a.answer||'')))+'</div>';
+        if(a&&a.score!==undefined)body+='<div>امتیاز: '+a.score+'</div>';
+      }
+      reviewHtml+='<div style="border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;break-inside:avoid">'+
+        '<div style="font-weight:700;font-size:.8rem;color:#333">سوال '+(i+1)+(skipped?' <span class="badge-skip">رد شده</span>':'')+'</div>'+body+'</div>';
+    });
+  }
+  const now=new Date();
+  const html='<div style="font-family:Tahoma,\'Segoe UI\',sans-serif;direction:rtl;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto">'+
+    '<div style="text-align:center;border-bottom:3px solid #6c5ce7;padding-bottom:16px;margin-bottom:20px">'+
+      '<div style="font-size:1.6rem;font-weight:900">📊 گزارش آزمون تعیین سطح انگلیسی</div>'+
+      '<div style="color:#666;font-size:.8rem;margin-top:6px">تاریخ: '+now.toLocaleDateString('fa-IR')+' — ساعت: '+now.toLocaleTimeString('fa-IR')+'</div>'+
+    '</div>'+
+    '<div style="text-align:center;margin-bottom:20px">'+
+      '<div style="font-size:3.5rem;font-weight:900;color:#6c5ce7">'+overallLevel+'</div>'+
+      '<div style="font-weight:700;font-size:1rem">'+levelDescs[overallLevel]+'</div>'+
+      '<div style="color:#666;font-size:.85rem;margin-top:4px">میانگین امتیاز: '+avgScore+'%</div>'+
+    '</div>'+
+    '<h3 style="border-bottom:2px solid #eee;padding-bottom:6px">📈 امتیاز بخش‌ها (آخرین آزمون هر بخش)</h3>'+
+    Object.keys(sectionNames).map(sec=>{
+      const r=latest[sec];
+      const pct=r?r.pct:0;
+      const col=sectionColors[sec];
+      return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:2px"><span>'+sectionIcons[sec]+' '+sectionNames[sec]+(r?' ('+r.level+')':'')+'</span><b>'+pct+'%</b></div>'+
+        '<div style="background:#eee;border-radius:4px;height:12px"><div style="background:'+col+';height:12px;border-radius:4px;width:'+pct+'%"></div></div></div>';
+    }).join('')+
+    (weakest&&strongest?'<div style="background:#f6f6f6;border-radius:8px;padding:10px;margin-top:12px;font-size:.82rem">'+
+      '<div style="margin-bottom:6px">✅ نقطه قوت: <b>'+sectionNames[strongest.section]+'</b> ('+strongest.pct+'%)</div>'+
+      '<div style="margin-bottom:6px">⚠️ نقطه ضعف: <b>'+sectionNames[weakest.section]+'</b> ('+weakest.pct+'%)</div>'+
+      '<div>🎯 توصیه: '+levelTips[overallLevel]+'</div></div>':'')+
+    (historyReversed.length?'<h3 style="border-bottom:2px solid #eee;padding-bottom:6px;margin-top:20px">📜 تاریخچه آزمون‌ها</h3>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:.78rem">'+
+      '<tr style="background:#6c5ce7;color:#fff"><th style="padding:6px;text-align:right">بخش</th><th style="padding:6px">سطح</th><th style="padding:6px">درصد</th><th style="padding:6px">زمان</th><th style="padding:6px">تاریخ</th></tr>'+
+      historyReversed.slice(0,30).map(r=>'<tr style="border-bottom:1px solid #eee"><td style="padding:5px">'+(sectionIcons[r.section]||'')+' '+(sectionNames[r.section]||r.section)+'</td><td style="padding:5px;text-align:center">'+r.level+'</td><td style="padding:5px;text-align:center"><b>'+r.pct+'%</b></td><td style="padding:5px;text-align:center">'+(r.time!==undefined?fmtTime(r.time):'—')+'</td><td style="padding:5px;text-align:center">'+new Date(r.date).toLocaleDateString('fa-IR')+'</td></tr>').join('')+
+      '</table>':'')+
+    (reviewHtml?'<h3 style="border-bottom:2px solid #eee;padding-bottom:6px;margin-top:20px">📋 مرور پاسخ‌های آخرین آزمون</h3>'+reviewHtml:'')+
+  '</div>';
+  let pr=document.getElementById('printArea');
+  if(!pr){pr=document.createElement('div');pr.id='printArea';document.body.appendChild(pr)}
+  pr.innerHTML=html;
+  window.print();
+}
+
+
 function renderResults(c){
   const history=S.results.slice(-50);
   if(!history.length){c.innerHTML='<div class="card" style="text-align:center;padding:60px"><div class="empty"><div class="icon">📊</div><p>هنوز آزمونی نداده‌اید</p><button class="btn btn-primary" style="margin-top:16px" onclick="currentTab=\'home\';render()">شروع آزمون</button></div></div>';return}
@@ -1195,6 +1292,7 @@ function renderResults(c){
     <div class="level-desc">میانگین امتیاز: ${avgScore}%</div>
   </div>
 
+  <div style="text-align:center;margin-bottom:16px"><button class="btn btn-primary" onclick="printReport()">🖨 خروجی PDF</button></div>
   <div class="level-scale">
     ${['A1','A2','B1','B2','C1','C2'].map(l=>'<div class="ls-item'+(l===overallLevel?' current':'')+'">'+l+'</div>').join('')}
   </div>
