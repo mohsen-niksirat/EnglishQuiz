@@ -110,6 +110,12 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .review-opt{padding:8px 12px;border-radius:8px;border:1px solid var(--border);font-size:.85rem;direction:ltr;text-align:left;margin-bottom:6px}
 .review-opt.correct{border-color:var(--success);background:rgba(0,184,148,.12);color:var(--success);font-weight:700}
 .review-opt.wrong{border-color:var(--danger);background:rgba(225,112,85,.12);color:var(--danger)}
+/* ═══ PRACTICE MODE ═══ */
+.q-option.correct-opt{border-color:var(--success)!important;background:rgba(0,184,148,.15)!important;color:var(--success)!important;font-weight:700}
+.q-option.wrong-opt{border-color:var(--danger)!important;background:rgba(225,112,85,.15)!important;color:var(--danger)!important}
+.q-feedback{margin-top:12px}
+.feed-ok{padding:10px 14px;border-radius:10px;background:rgba(0,184,148,.1);border:1px solid rgba(0,184,148,.3);color:var(--success);font-size:.85rem;margin-bottom:8px}
+.feed-bad{padding:10px 14px;border-radius:10px;background:rgba(225,112,85,.1);border:1px solid rgba(225,112,85,.3);color:var(--danger);font-size:.85rem;margin-bottom:8px}
 /* ═══ TIMER ═══ */
 .timer-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;font-size:.85rem;color:var(--text2);font-weight:500}
 .timer-bar .time{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -378,8 +384,8 @@ function stopTimer(){
   const s=testState;
   if(s.timer){clearInterval(s.timer);s.timer=null;}
 }
-function startTest(section){
-  testState={section,questions:generateTestQuestions(section),currentQ:0,answers:{},score:0,startTime:Date.now(),timer:null,timeLeft:0,answered:false,reviewMode:false};
+function startTest(section,mode){
+  testState={section,questions:generateTestQuestions(section),currentQ:0,answers:{},score:0,startTime:Date.now(),timer:null,timeLeft:0,answered:false,reviewMode:false,mode:mode||'test'};
   startTimer();
   renderQuizQuestion(document.getElementById('content'));
 }
@@ -600,9 +606,7 @@ function renderHome(c){
 let fullTestState={sections:['vocab','grammar','listening','writing'],current:0,scores:{}};
 function startFullTest(){
   fullTestState={sections:['vocab','grammar','listening','writing'],current:0,scores:{}};
-  navigateTo('vocab');
-  startTest('vocab');
-  toast('آزمون کامل شروع شد! 💪','info');
+  showModeSelect('',true);
 }
 
 // ═══════════════════════════════════════════
@@ -635,6 +639,13 @@ function renderQuizQuestion(c){
   const qText=q.question||q.q||'';
   const prevAns=s.answers[s.currentQ];
   const hasAnswer=prevAns&&prevAns.answer!==undefined&&prevAns.answer>=0;
+  const isPractice=s.mode==='practice';
+  const modeBadge=isPractice?'<span class="badge badge-warning" style="margin-right:6px">📖 تمرینی</span>':'<span class="badge badge-accent" style="margin-right:6px">🎯 تست</span>';
+  const navLeft=isPractice?'':(
+    '<button class="btn btn-ghost btn-sm" onclick="goPrev()" '+(s.currentQ===0?'disabled style="opacity:.4"':'')+'>→ قبلی</button>'+
+    (hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>')
+  );
+  const navRight=isPractice?'':'<button class="btn btn-primary btn-sm" '+(s.currentQ>=s.questions.length-1?'onclick="finishTest()">پایان آزمون ✓':'onclick="goNext()">بعدی ←')+'</button>';
   let html=`
   <div class="timer-bar">
     <span>${sectionNames[s.section]} — سوال ${s.currentQ+1} از ${s.questions.length}</span>
@@ -642,35 +653,62 @@ function renderQuizQuestion(c){
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
   <div class="question-card card">
-    <div class="q-number">سوال ${s.currentQ+1}</div>
+    <div class="q-number">سوال ${s.currentQ+1}${modeBadge}</div>
     ${q.level?'<span class="badge badge-accent" style="margin-bottom:8px">'+q.level+'</span>':''}
     <div class="q-text" style="direction:ltr;text-align:left">${esc(qText)}</div>
     <div class="q-options" id="qOptions">
       ${q.options.map((opt,i)=>'<button class="q-option'+(hasAnswer&&prevAns.answer===i?' selected':'')+'" data-idx="'+i+'">'+esc(opt)+'</button>').join('')}
     </div>
+    <div class="q-feedback" id="qFeedback"></div>
     <div class="q-nav">
-      <button class="btn btn-ghost btn-sm" onclick="goPrev()" ${s.currentQ===0?'disabled style="opacity:.4"':''}>→ قبلی</button>
-      ${hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>'}
-      ${s.currentQ>=s.questions.length-1?'<button class="btn btn-primary btn-sm" onclick="finishTest()">پایان آزمون ✓</button>':'<button class="btn btn-primary btn-sm" onclick="goNext()">بعدی ←</button>'}
+      ${navLeft}
+      <button class="btn btn-primary btn-sm" id="qNextBtn" style="display:none">بعدی ←</button>
+      ${navRight}
     </div>
   </div>`;
 
   c.innerHTML=html;
 
-  // Bind options — record silently, correct answer is revealed at the end
+  // Bind options
   document.querySelectorAll('.q-option').forEach(btn=>{
     btn.onclick=()=>{
       if(s.answered)return;
       s.answered=true;
       const idx=parseInt(btn.dataset.idx);
-      s.answers[s.currentQ]={qIdx:s.currentQ,answer:idx,correct:idx===q.answer};
+      const isCorrect=idx===q.answer;
+      s.answers[s.currentQ]={qIdx:s.currentQ,answer:idx,correct:isCorrect};
       recalcScore();
-      // Only mark the user's selection — no correct/wrong shown now
       document.querySelectorAll('.q-option').forEach((b,i)=>{
         b.disabled=true;
-        if(i===idx)b.classList.add('selected');
+        if(isPractice){
+          if(i===q.answer)b.classList.add('correct-opt');
+          else if(i===idx)b.classList.add('wrong-opt');
+        }else if(i===idx){
+          b.classList.add('selected');
+        }
       });
-      setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+      if(isPractice){
+        // Immediate feedback + manual next
+        const fb=document.getElementById('qFeedback');
+        if(fb){
+          fb.innerHTML=isCorrect
+            ?'<div class="feed-ok">✅ درست! '+esc(q.explain||'')+'</div>'
+            :'<div class="feed-bad">❌ نادرست — جواب درست: <strong>'+esc(q.options[q.answer])+'</strong></div><div class="q-explanation">'+esc(q.explain||'')+'</div>';
+        }
+        const nb=document.getElementById('qNextBtn');
+        if(nb){
+          nb.style.display='inline-block';
+          if(s.currentQ>=s.questions.length-1){
+            nb.textContent='پایان و مشاهده نتیجه ✓';
+            nb.onclick=()=>finishSection();
+          }else{
+            nb.onclick=()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)};
+          }
+        }
+      }else{
+        // Test mode: silent selection, auto-advance
+        setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+      }
     };
   });
 }
@@ -683,6 +721,7 @@ function recalcScore(){
 
 function skipQuestion(){
   const s=testState;
+  if(s.mode==='practice')return;
   if(s.answered)return;
   if(s.answers[s.currentQ]&&s.answers[s.currentQ].answer>=0)return;
   s.answers[s.currentQ]={qIdx:s.currentQ,answer:-1,correct:false,skipped:true};
@@ -695,6 +734,7 @@ function skipQuestion(){
 
 function goPrev(){
   const s=testState;
+  if(s.mode==='practice')return;
   if(s.currentQ>0){s.currentQ--;s.answered=false;renderQuizQuestion(document.getElementById('content'));}
 }
 function goNext(){
@@ -814,11 +854,13 @@ function renderListeningQuestion(c,q,s){
     <div style="margin-bottom:16px">
       <input type="text" class="q-input" id="listenInput" placeholder="جمله را اینجا تایپ کنید..." autocomplete="off" autocapitalize="off" spellcheck="false" value="${hasAnswer&&prevAns.answer!==-1?esc(String(prevAns.answer).replace(/"/g,'&quot;')):''}">
     </div>
+    <div class="q-feedback" id="qFeedback"></div>
     <div class="q-nav">
-      <button class="btn btn-ghost btn-sm" onclick="goPrev()" ${s.currentQ===0?'disabled style="opacity:.4"':''}>→ قبلی</button>
-      ${hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>'}
+      ${s.mode==='practice'?'':'<button class="btn btn-ghost btn-sm" onclick="goPrev()" '+(s.currentQ===0?'disabled style="opacity:.4"':'')+'>→ قبلی</button>'}
+      ${s.mode==='practice'||hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>'}
       <button class="btn btn-success btn-sm" id="listenCheck">بررسی ✓</button>
-      ${s.currentQ>=s.questions.length-1?'<button class="btn btn-primary btn-sm" onclick="finishTest()">پایان آزمون ✓</button>':'<button class="btn btn-primary btn-sm" onclick="goNext()">بعدی ←</button>'}
+      <button class="btn btn-primary btn-sm" id="listenNext" style="display:none">بعدی ←</button>
+      ${s.mode==='practice'?'':'<button class="btn btn-primary btn-sm" '+(s.currentQ>=s.questions.length-1?'onclick="finishTest()">پایان آزمون ✓':'onclick="goNext()">بعدی ←')+'</button>'}
     </div>
   </div>`;
 
@@ -842,7 +884,20 @@ function renderListeningQuestion(c,q,s){
     s.answered=true;
     input.disabled=true;
     document.getElementById('listenCheck').disabled=true;
-    setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+    if(s.mode==='practice'){
+      const fb=document.getElementById('qFeedback');
+      if(fb){
+        fb.innerHTML=(isCorrect?'<div class="feed-ok">✅ درست!</div>':'<div class="feed-bad">❌ نادرست</div>')+'<div class="q-explanation">جمله درست: <strong style="direction:ltr">'+esc(q.sentence)+'</strong></div>';
+      }
+      const nb=document.getElementById('listenNext');
+      if(nb){
+        nb.style.display='inline-block';
+        if(s.currentQ>=s.questions.length-1){nb.textContent='پایان و مشاهده نتیجه ✓';nb.onclick=()=>finishSection();}
+        else nb.onclick=()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)};
+      }
+    }else{
+      setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+    }
   };
 
   input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('listenCheck').click()}};
@@ -873,11 +928,13 @@ function renderWritingQuestion(c,q,s){
     <div class="q-number">موضوع ${s.currentQ+1} — <span class="badge badge-danger">${q.level}</span></div>
     <div class="q-text" style="direction:ltr;text-align:left">${esc(q.prompt)}</div>
     <textarea class="writing-area" id="writingInput" placeholder="Type your answer in English..." rows="4">${hasAnswer&&prevAns.answer!==-1?esc(String(prevAns.answer)):''}</textarea>
+    <div class="q-feedback" id="qFeedback"></div>
     <div class="q-nav">
-      <button class="btn btn-ghost btn-sm" onclick="goPrev()" ${s.currentQ===0?'disabled style="opacity:.4"':''}>→ قبلی</button>
-      ${hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>'}
+      ${s.mode==='practice'?'':'<button class="btn btn-ghost btn-sm" onclick="goPrev()" '+(s.currentQ===0?'disabled style="opacity:.4"':'')+'>→ قبلی</button>'}
+      ${s.mode==='practice'||hasAnswer?'':'<button class="btn btn-ghost btn-sm" onclick="skipQuestion()">رد شدن →</button>'}
       <button class="btn btn-success btn-sm" id="writingCheck">بررسی ✓</button>
-      ${s.currentQ>=s.questions.length-1?'<button class="btn btn-primary btn-sm" onclick="finishTest()">پایان آزمون ✓</button>':'<button class="btn btn-primary btn-sm" onclick="goNext()">بعدی ←</button>'}
+      <button class="btn btn-primary btn-sm" id="writingNext" style="display:none">بعدی ←</button>
+      ${s.mode==='practice'?'':'<button class="btn btn-primary btn-sm" '+(s.currentQ>=s.questions.length-1?'onclick="finishTest()">پایان آزمون ✓':'onclick="goNext()">بعدی ←')+'</button>'}
     </div>
   </div>`;
 
@@ -893,7 +950,20 @@ function renderWritingQuestion(c,q,s){
     s.answered=true;
     document.getElementById('writingInput').disabled=true;
     document.getElementById('writingCheck').disabled=true;
-    setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+    if(s.mode==='practice'){
+      const fb=document.getElementById('qFeedback');
+      if(fb){
+        fb.innerHTML=(result.score>=50?'<div class="feed-ok">✅ امتیاز: '+result.score+'/100</div>':'<div class="feed-bad">❌ امتیاز: '+result.score+'/100 — '+esc(result.feedback||'')+'</div>');
+      }
+      const nb=document.getElementById('writingNext');
+      if(nb){
+        nb.style.display='inline-block';
+        if(s.currentQ>=s.questions.length-1){nb.textContent='پایان و مشاهده نتیجه ✓';nb.onclick=()=>finishSection();}
+        else nb.onclick=()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)};
+      }
+    }else{
+      setTimeout(()=>{s.currentQ++;s.answered=false;renderQuizQuestion(c)},450);
+    }
   };
 }
 // ═══════════════════════════════════════════
@@ -952,19 +1022,19 @@ function finishSection(){
     <h3 style="margin-bottom:12px">🎯 بخش بعدی؟</h3>
     <p style="color:var(--text2);font-size:.85rem;margin-bottom:16px">کدوم بخش رو می‌خواید ادامه بدید؟</p>
     <div style="display:grid;gap:8px">
-      <button class="quiz-section-btn" onclick="navigateTo('vocab')" style="padding:12px">
+      <button class="quiz-section-btn" onclick="nextSection('vocab')" style="padding:12px">
         <span style="font-size:1.2rem">📖</span>
         <span style="flex:1;text-align:right">واژگان</span>
       </button>
-      <button class="quiz-section-btn" onclick="navigateTo('grammar')" style="padding:12px">
+      <button class="quiz-section-btn" onclick="nextSection('grammar')" style="padding:12px">
         <span style="font-size:1.2rem">✏️</span>
         <span style="flex:1;text-align:right">گرامر</span>
       </button>
-      <button class="quiz-section-btn" onclick="navigateTo('listening')" style="padding:12px">
+      <button class="quiz-section-btn" onclick="nextSection('listening')" style="padding:12px">
         <span style="font-size:1.2rem">🎧</span>
         <span style="flex:1;text-align:right">لیسنینگ</span>
       </button>
-      <button class="quiz-section-btn" onclick="navigateTo('writing')" style="padding:12px">
+      <button class="quiz-section-btn" onclick="nextSection('writing')" style="padding:12px">
         <span style="font-size:1.2rem">📝</span>
         <span style="flex:1;text-align:right">رایتینگ</span>
       </button>
@@ -975,10 +1045,47 @@ function finishSection(){
 // ═══════════════════════════════════════════
 // SECTION STUBS
 // ═══════════════════════════════════════════
-function renderVocabSection(c){startTest('vocab')}
-function renderGrammarSection(c){startTest('grammar')}
-function renderListeningSection(c){startTest('listening')}
-function renderWritingSection(c){startTest('writing')}
+function renderVocabSection(c){showModeSelect('vocab')}
+function renderGrammarSection(c){showModeSelect('grammar')}
+function renderListeningSection(c){showModeSelect('listening')}
+function renderWritingSection(c){showModeSelect('writing')}
+function showModeSelect(section,isFull){
+  const c=document.getElementById('content');
+  const names={vocab:'📖 واژگان',grammar:'✏️ گرامر',listening:'🎧 لیسنینگ',writing:'📝 رایتینگ'};
+  const title=isFull?'🎯 آزمون کامل (هر ۴ بخش)':(names[section]||'');
+  c.innerHTML=`
+  <div class="card" style="text-align:center;max-width:480px;margin:40px auto">
+    <div style="font-size:2.6rem;margin-bottom:10px">${title}</div>
+    <h2 style="margin-bottom:14px">حالت آزمون را انتخاب کنید</h2>
+    <div style="display:grid;gap:12px;text-align:center">
+      <button class="btn btn-primary" onclick="startMode('${isFull?'full':'single'}','${section}','test')">
+        🎯 تست واقعی
+        <span style="display:block;font-size:.72rem;opacity:.85;font-weight:400;margin-top:4px">بدون نمایش جواب — برگشت و تعویض جواب</span>
+      </button>
+      <button class="btn btn-ghost" onclick="startMode('${isFull?'full':'single'}','${section}','practice')">
+        📖 تمرینی
+        <span style="display:block;font-size:.72rem;opacity:.85;font-weight:400;margin-top:4px">نمایش فوری جواب با توضیح — دکمه بعدی دستی</span>
+      </button>
+    </div>
+    <div class="q-nav" style="margin-top:16px">
+      <button class="btn btn-ghost btn-sm" onclick="currentTab='home';navHistory=['home'];render()">→ بازگشت</button>
+    </div>
+  </div>`;
+}
+function startMode(scope,section,mode){
+  if(scope==='full'){
+    fullTestState={sections:['vocab','grammar','listening','writing'],current:0,scores:{},mode};
+    navigateTo('vocab');
+    startTest('vocab',mode);
+    toast('آزمون کامل شروع شد! 💪','info');
+  }else{
+    startTest(section,mode);
+  }
+}
+function nextSection(sec){
+  if(fullTestState.mode){startTest(sec,fullTestState.mode)}
+  else{navigateTo(sec)}
+}
 
 // ═══════════════════════════════════════════
 // RESULTS
