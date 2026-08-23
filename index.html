@@ -895,7 +895,8 @@ function finishSection(){
   results[s.section]=pct;
 
   // Save result
-  S.results.push({date:new Date().toISOString(),section:s.section,level,score:s.score,total,pct});
+  const sec=elapsedSec();
+  S.results.push({date:new Date().toISOString(),section:s.section,level,score:s.score,total,pct,time:sec});
   save();
 
   const c=document.getElementById('content');
@@ -907,7 +908,7 @@ function finishSection(){
     <div class="stat-grid">
       <div class="stat-card"><div class="val">${s.score}/${total}</div><div class="lbl">پاسخ صحیح</div></div>
       <div class="stat-card"><div class="val">${pct}%</div><div class="lbl">درصد</div></div>
-      <div class="stat-card"><div class="val" style="font-size:1.5rem">${fmtTime(elapsedSec())}</div><div class="lbl">⏱ زمان</div></div>
+      <div class="stat-card"><div class="val" style="font-size:1.5rem">${fmtTime(sec)}</div><div class="lbl">⏱ زمان</div></div>
     </div>
     <div class="q-nav" style="margin-top:20px">
       <button class="btn btn-primary" onclick="currentTab='home';navHistory=['home'];render()">بازگشت به خانه</button>
@@ -1057,22 +1058,73 @@ function renderResults(c){
     </div>
   </div>
 
+  <!-- ═══ Progress Chart ═══ -->
+  <div class="card" style="margin-bottom:16px">
+    <h3 style="margin-bottom:12px">📈 روند پیشرفت در طول زمان</h3>
+    ${progressChart(historyReversed,sectionColors)}
+  </div>
+
   <!-- ═══ History ═══ -->
   <div class="card">
-    <h3 style="margin-bottom:16px">📜 تاریخچه آزمون‌ها</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin-bottom:0">📜 تاریخچه آزمون‌ها</h3>
+      <button class="btn btn-ghost btn-sm" onclick="clearHistory()">🗑 پاک کردن</button>
+    </div>
     <div style="max-height:400px;overflow-y:auto">
       ${historyReversed.map(r=>`
-        <div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);flex-wrap:wrap">
           <span class="badge badge-accent">${r.level}</span>
           <span style="font-size:.85rem;color:var(--text2)">${sectionIcons[r.section]||''} ${sectionNames[r.section]||r.section}</span>
           <span style="font-size:.85rem;font-weight:700;color:${sectionColors[r.section]||'var(--text)'}">${r.pct}%</span>
-          <span style="font-size:.75rem;color:var(--text2);margin-right:auto">${new Date(r.date).toLocaleDateString('fa-IR')}</span>
+          <span style="font-size:.75rem;color:var(--text2)">⏱ ${r.time!==undefined?fmtTime(r.time):'—'}</span><span style="font-size:.75rem;color:var(--text2);margin-right:auto">${new Date(r.date).toLocaleDateString('fa-IR')}</span><button class="btn btn-ghost btn-sm" onclick="retrySection('${r.section}')">تمرین مجدد ↻</button>
         </div>
       `).join('')}
     </div>
   </div>`;
 
   c.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// RESULTS HELPERS
+// ═══════════════════════════════════════════
+function progressChart(history,colors){
+  const ch=[...history].reverse();
+  if(!ch.length)return'<p style="color:var(--text2);font-size:.8rem">داده‌ای برای نمودار وجود ندارد</p>';
+  const W=560,H=170,PAD=30;
+  const n=ch.length;
+  const xStep=n>1?(W-2*PAD)/(n-1):0;
+  const pts=ch.map((r,i)=>{
+    const x=n>1?PAD+i*xStep:W/2;
+    const y=H-PAD-(Math.min(100,Math.max(0,r.pct))/100)*(H-2*PAD);
+    return{x,y,pct:r.pct,sec:r.section,date:new Date(r.date)};
+  });
+  const line=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+  const area=(n>1)?(PAD+','+(H-PAD)+' '+line+' '+(W-PAD)+','+(H-PAD)):'';
+  const grid=[0,25,50,75,100].map(g=>{
+    const y=H-PAD-(g/100)*(H-2*PAD);
+    return'<line x1="'+PAD+'" y1="'+y.toFixed(1)+'" x2="'+(W-PAD)+'" y2="'+y.toFixed(1)+'" stroke="var(--border)" stroke-dasharray="3 3" stroke-width="1"/><text x="6" y="'+(y+3).toFixed(1)+'" font-size="8" fill="var(--text2)">'+g+'</text>';
+  }).join('');
+  const dots=pts.map((p,i)=>{
+    const color=colors[p.sec]||'#6c5ce7';
+    const lab=(n>10&&i%2===1&&i<n-1)?'':'<text x="'+p.x.toFixed(1)+'" y="'+(p.y-9).toFixed(1)+'" text-anchor="middle" font-size="9" font-weight="700" fill="'+color+'">'+p.pct+'%</text>';
+    return'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4.5" fill="'+color+'" stroke="var(--bg)" stroke-width="1.5"/>'+lab;
+  }).join('');
+  const xlabs=pts.map((p,i)=>{
+    if(n>10&&i%2===1&&i<n-1)return'';
+    const d=p.date.toLocaleDateString('fa-IR',{month:'2-digit',day:'2-digit'});
+    return'<text x="'+p.x.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="8" fill="var(--text2)">'+d+'</text>';
+  }).join('');
+  return'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;direction:ltr">'+grid+(area?'<polygon points="'+area+'" fill="rgba(108,92,231,.10)"/>':'')+'<polyline points="'+line+'" fill="none" stroke="#6c5ce7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+dots+xlabs+'</svg>';
+}
+function retrySection(sec){
+  currentTab=sec;navHistory=['home'];
+  render();
+  startTest(sec);
+}
+function clearHistory(){
+  if(!confirm('همه تاریخچه آزمون‌ها پاک شود؟'))return;
+  S.results=[];save();render();
 }
 
 // ═══════════════════════════════════════════
